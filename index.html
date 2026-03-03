@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>オセロ</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <h1>オセロ</h1>
+
+    <div id="scoreboard">
+      <div class="player-info" id="player-side">
+        <div class="piece-icon black-icon"></div>
+        <span class="player-label">あなた</span>
+        <span class="count" id="black-count">2</span>
+      </div>
+
+      <div id="turn-display">あなたの番</div>
+
+      <div class="player-info" id="ai-side">
+        <span class="count" id="white-count">2</span>
+        <span class="player-label">CPU</span>
+        <div class="piece-icon white-icon"></div>
+      </div>
+    </div>
+
+    <div id="board-wrapper">
+      <div id="board"></div>
+    </div>
+
+    <div id="message"></div>
+
+    <button id="restart-btn" onclick="initGame()">もう一度プレイ</button>
+  </div>
+
+  <script src="js/game.js"></script>
+</body>
+</html>
