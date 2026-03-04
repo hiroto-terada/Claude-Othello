@@ -43,6 +43,85 @@ let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong'
 
 const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王' };
 
+// ===== CPU Face Data =====
+
+const CPU_FACE_HTML = {
+  weak: `
+    <div class="av-slime">
+      <div class="sl-shine"></div>
+      <div class="sl-eye sl-l"></div>
+      <div class="sl-eye sl-r"></div>
+      <div class="sl-mouth"></div>
+    </div>`,
+  medium: `
+    <div class="av-knight">
+      <div class="kn-plume"></div>
+      <div class="kn-helm">
+        <div class="kn-visor"></div>
+      </div>
+    </div>`,
+  strong: `
+    <div class="av-demon">
+      <div class="dm-horn dm-hl"></div>
+      <div class="dm-horn dm-hr"></div>
+      <div class="dm-face">
+        <div class="dm-eye dm-el"></div>
+        <div class="dm-eye dm-er"></div>
+        <div class="dm-mouth">
+          <div class="dm-tooth"></div>
+          <div class="dm-tooth"></div>
+          <div class="dm-tooth"></div>
+        </div>
+      </div>
+    </div>`,
+};
+
+const CPU_MOOD_TEXTS = {
+  weak:   { 'mood-happy': 'やったー！', 'mood-neutral': 'えへへ…',    'mood-sad': 'うわーん！' },
+  medium: { 'mood-happy': '余裕だな',   'mood-neutral': '油断するな', 'mood-sad': 'くっ…'     },
+  strong: { 'mood-happy': 'フフフ…',   'mood-neutral': 'なかなかやる', 'mood-sad': 'な、なんと…' },
+};
+
+const CPU_GAMEOVER_TEXTS = {
+  weak:   { win: 'やったー！勝ったよ！', lose: 'うわーん負けたー！', draw: 'ひきわけだね！' },
+  medium: { win: '完璧だ。',             lose: '…まさか。',           draw: '互角だったな。' },
+  strong: { win: 'フハハ！圧勝だ！',     lose: '貴様…やるな。',       draw: 'くっ、引き分けか…' },
+};
+
+function initCpuFace() {
+  const faceEl = document.getElementById('cpu-face');
+  faceEl.innerHTML = CPU_FACE_HTML[currentDifficulty];
+  faceEl.className = 'mood-neutral';
+  document.getElementById('cpu-bubble-text').textContent =
+    CPU_MOOD_TEXTS[currentDifficulty]['mood-neutral'];
+}
+
+function updateCpuMood(gameOver = false, result = null) {
+  const faceEl   = document.getElementById('cpu-face');
+  const bubbleEl = document.getElementById('cpu-bubble-text');
+  if (!faceEl) return;
+
+  let mood;
+  let text;
+
+  if (gameOver && result) {
+    mood = result === 'cpu'  ? 'mood-happy'
+         : result === 'player' ? 'mood-sad'
+         : 'mood-neutral';
+    const key = result === 'cpu' ? 'win' : result === 'player' ? 'lose' : 'draw';
+    text = CPU_GAMEOVER_TEXTS[currentDifficulty][key];
+  } else {
+    const w    = countPieces(board, WHITE);
+    const b    = countPieces(board, BLACK);
+    const diff = w - b;
+    mood = diff > 3 ? 'mood-happy' : diff < -3 ? 'mood-sad' : 'mood-neutral';
+    text = CPU_MOOD_TEXTS[currentDifficulty][mood];
+  }
+
+  faceEl.className   = mood;
+  bubbleEl.textContent = text;
+}
+
 // ===== Screen Management =====
 
 function showSelectScreen() {
@@ -59,6 +138,7 @@ function startGame(difficulty) {
   currentDifficulty = difficulty;
   document.getElementById('cpu-label').textContent = CPU_NAMES[difficulty];
   showGameScreen();
+  initCpuFace();
   initGame();
 }
 
@@ -299,6 +379,8 @@ function render() {
 
   document.getElementById('player-side').classList.toggle('active', !isAiMoving && !isGameOver);
   document.getElementById('ai-side').classList.toggle('active', isAiMoving);
+
+  updateCpuMood();
 }
 
 function setTurn(text) {
@@ -406,13 +488,15 @@ function endGame() {
   const w = countPieces(board, WHITE);
   let msg;
 
-  if      (b > w) msg = `あなたの勝ち！🎉  (${b} vs ${w})`;
-  else if (w > b) msg = `CPUの勝ち… 😔  (${w} vs ${b})`;
-  else            msg = `引き分け！🤝  (${b} vs ${w})`;
+  let result;
+  if      (b > w) { msg = `あなたの勝ち！🎉  (${b} vs ${w})`; result = 'player'; }
+  else if (w > b) { msg = `CPUの勝ち… 😔  (${w} vs ${b})`; result = 'cpu';    }
+  else            { msg = `引き分け！🤝  (${b} vs ${w})`;    result = 'draw';   }
 
   setTurn('ゲーム終了');
   setMsg(msg, true);
   render();
+  updateCpuMood(true, result);
 }
 
 // ===== Init =====
@@ -423,6 +507,14 @@ function initGame() {
   isAiMoving = false;
   lastMove   = null;
   lastFlips  = [];
+
+  const faceEl = document.getElementById('cpu-face');
+  if (faceEl) {
+    if (!faceEl.innerHTML.trim()) initCpuFace();
+    else faceEl.className = 'mood-neutral';
+    document.getElementById('cpu-bubble-text').textContent =
+      CPU_MOOD_TEXTS[currentDifficulty]['mood-neutral'];
+  }
 
   setTurn('あなたの番');
   setMsg('');
