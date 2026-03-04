@@ -538,6 +538,137 @@ h1 {
 .game-btn:hover  { filter: brightness(1.12); }
 .game-btn:active { transform: scale(0.96); }
 
+/* ===== CPU Portrait Panel ===== */
+#cpu-portrait {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0 0.4rem;
+}
+
+/* Speech bubble */
+#cpu-bubble {
+  position: relative;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  padding: 0.3rem 0.65rem;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: bold;
+  white-space: nowrap;
+  min-width: 64px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: opacity 0.25s;
+}
+#cpu-bubble::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid rgba(255, 255, 255, 0.28);
+}
+
+/* Character container */
+#cpu-face {
+  width: 80px;
+  height: 90px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Scale avatars to fit portrait */
+#cpu-face .av-slime,
+#cpu-face .av-knight,
+#cpu-face .av-demon {
+  transform: scale(0.85);
+  transform-origin: top center;
+  transition: transform 0.2s ease-out;
+}
+
+/* ---- Slime moods ---- */
+/* mood-happy: squinting eyes */
+#cpu-face.mood-happy .sl-eye {
+  height: 5px;
+}
+/* mood-neutral: straight mouth */
+#cpu-face.mood-neutral .sl-mouth {
+  border: none;
+  border-bottom: 3px solid #1a2e00;
+  border-radius: 0;
+  height: 0;
+  width: 22px;
+}
+/* mood-sad: frown + droopy eyes */
+#cpu-face.mood-sad .sl-mouth {
+  border: 3px solid #1a2e00;
+  border-bottom: none;
+  border-radius: 14px 14px 0 0;
+  bottom: 12px;
+}
+#cpu-face.mood-sad .sl-eye {
+  top: 33px;
+  border-radius: 40% 40% 60% 60% / 30% 30% 70% 70%;
+}
+
+/* ---- Knight moods ---- */
+/* mood-happy: bright blue (default) */
+/* mood-neutral: dim visor */
+#cpu-face.mood-neutral .kn-visor {
+  background: #07070f;
+  box-shadow: none;
+}
+/* mood-sad: reddish visor */
+#cpu-face.mood-sad .kn-visor {
+  background: #180000;
+  box-shadow: 0 0 6px rgba(255, 50, 50, 0.5),
+              inset 0 1px 3px rgba(255, 50, 50, 0.3);
+}
+
+/* ---- Demon moods ---- */
+/* mood-happy: blazing eyes + wider grin */
+#cpu-face.mood-happy .dm-eye {
+  box-shadow: 0 0 14px #ff4400, 0 0 30px rgba(255, 80, 0, 0.85);
+}
+#cpu-face.mood-happy .dm-mouth {
+  width: 48px;
+}
+/* mood-neutral: default (no override needed) */
+/* mood-sad: dim eyes + shrunken mouth */
+#cpu-face.mood-sad .dm-eye {
+  background: radial-gradient(ellipse at 50% 40%, #663300, #3a0000);
+  box-shadow: 0 0 3px #220800, 0 0 6px rgba(80, 20, 0, 0.25);
+}
+#cpu-face.mood-sad .dm-mouth {
+  height: 9px;
+  border-radius: 2px 2px 6px 6px;
+}
+#cpu-face.mood-sad .dm-tooth {
+  height: 5px;
+}
+
+/* Mood-change pop animation */
+@keyframes facePop {
+  0%   { transform: scale(0.85); }
+  55%  { transform: scale(0.93); }
+  100% { transform: scale(0.85); }
+}
+#cpu-face.mood-happy .av-slime,
+#cpu-face.mood-happy .av-knight,
+#cpu-face.mood-happy .av-demon {
+  animation: facePop 0.4s ease-out;
+}
+
 /* ===== Active player highlight ===== */
 #player-side.active .piece-icon,
 #ai-side.active .piece-icon {
