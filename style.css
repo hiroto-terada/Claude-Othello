@@ -16,15 +16,8 @@ body {
   overflow-x: hidden;
 }
 
-/* ===== App Wrapper ===== */
-#app {
-  width: 100%;
-  max-width: 520px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.85rem;
-}
+/* ===== Utility ===== */
+.hidden { display: none !important; }
 
 /* ===== Title ===== */
 h1 {
@@ -33,6 +26,318 @@ h1 {
   letter-spacing: 0.35em;
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
   user-select: none;
+}
+
+/* ===================================================
+   SELECT SCREEN
+   =================================================== */
+#select-screen {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.select-lead {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+}
+
+/* ----- Card row ----- */
+#cpu-cards {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+.cpu-card {
+  flex: 1;
+  max-width: 158px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 1.1rem 0.5rem 1rem;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cpu-card:hover  { transform: translateY(-5px) scale(1.04); }
+.cpu-card:active { transform: scale(0.96); }
+
+/* Themed card backgrounds */
+.weak-card {
+  background: linear-gradient(160deg, #174f08 0%, #2b8514 55%, #1c6610 100%);
+  box-shadow: 0 6px 22px rgba(0, 120, 0, 0.45);
+  border: 1px solid rgba(120, 255, 60, 0.2);
+}
+.mid-card {
+  background: linear-gradient(160deg, #09205a 0%, #1a4a92 55%, #0d3472 100%);
+  box-shadow: 0 6px 22px rgba(0, 60, 180, 0.45);
+  border: 1px solid rgba(100, 160, 255, 0.2);
+}
+.strong-card {
+  background: linear-gradient(160deg, #1e0000 0%, #600808 55%, #3c0404 100%);
+  box-shadow: 0 6px 22px rgba(180, 0, 0, 0.5);
+  border: 1px solid rgba(255, 60, 60, 0.2);
+}
+
+/* ----- Avatar container ----- */
+.cpu-avatar {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.15rem 0;
+}
+
+/* ===================================================
+   CSS ART – SLIME (弱)
+   =================================================== */
+.av-slime {
+  width: 78px;
+  height: 74px;
+  background: radial-gradient(ellipse at 38% 32%, #d4ff6a, #62d41c, #3caa0c);
+  border-radius: 50% 50% 46% 54% / 46% 46% 56% 54%;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4),
+              inset 0 -6px 10px rgba(0, 80, 0, 0.25);
+}
+
+/* Sheen */
+.sl-shine {
+  position: absolute;
+  width: 22px;
+  height: 13px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  top: 9px;
+  left: 10px;
+  transform: rotate(-20deg);
+}
+
+/* Eyes */
+.sl-eye {
+  position: absolute;
+  width: 14px;
+  height: 9px;
+  background: #1a2e00;
+  border-radius: 50%;
+  top: 30px;
+}
+.sl-eye::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  top: 1px;
+  right: 2px;
+}
+.sl-l { left: 14px; }
+.sl-r { right: 14px; }
+
+/* Smile */
+.sl-mouth {
+  position: absolute;
+  width: 28px;
+  height: 13px;
+  border: 3px solid #1a2e00;
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  bottom: 13px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ===================================================
+   CSS ART – KNIGHT (中)
+   =================================================== */
+.av-knight {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 70px;
+  height: 86px;
+}
+
+/* Plume */
+.kn-plume {
+  width: 7px;
+  height: 20px;
+  background: linear-gradient(to bottom, #ff4040, #ff8800, #ffcc00);
+  border-radius: 3px 3px 0 0;
+  margin-bottom: -3px;
+  z-index: 1;
+  box-shadow: 0 0 6px rgba(255, 140, 0, 0.5);
+}
+
+/* Helmet body */
+.kn-helm {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(150deg, #a8c8f8 0%, #5a8fd4 35%, #2d5a9e 70%, #1a3a6e 100%);
+  border-radius: 50% 50% 28% 28% / 55% 55% 28% 28%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 3px 6px 16px rgba(0, 0, 0, 0.5),
+              inset -4px -4px 10px rgba(0, 0, 60, 0.35),
+              inset 3px 3px 8px rgba(255, 255, 255, 0.12);
+}
+
+/* Visor slit */
+.kn-visor {
+  width: 54px;
+  height: 11px;
+  background: #06060e;
+  border-radius: 3px;
+  margin-top: 8px;
+  box-shadow: 0 0 8px rgba(140, 200, 255, 0.6),
+              inset 0 1px 4px rgba(120, 180, 255, 0.4);
+}
+
+/* ===================================================
+   CSS ART – DEMON (強)
+   =================================================== */
+.av-demon {
+  position: relative;
+  width: 82px;
+  height: 92px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Horns */
+.dm-horn {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+.dm-hl {
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 32px solid #6a0a0a;
+  left: 4px;
+  transform: rotate(-14deg);
+  filter: drop-shadow(0 0 5px rgba(220, 0, 0, 0.4));
+}
+.dm-hr {
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 32px solid #6a0a0a;
+  right: 4px;
+  transform: rotate(14deg);
+  filter: drop-shadow(0 0 5px rgba(220, 0, 0, 0.4));
+}
+
+/* Face */
+.dm-face {
+  width: 74px;
+  height: 68px;
+  background: radial-gradient(ellipse at 50% 40%, #3e0c0c, #190000);
+  border-radius: 46% 46% 38% 38% / 50% 50% 36% 36%;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(200, 0, 0, 0.35),
+              inset 0 -6px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* Glowing eyes */
+.dm-eye {
+  position: absolute;
+  width: 18px;
+  height: 10px;
+  background: radial-gradient(ellipse at 50% 40%, #ff7700, #cc0000);
+  border-radius: 50%;
+  top: 22px;
+  box-shadow: 0 0 8px #ff3300, 0 0 18px rgba(255, 60, 0, 0.6);
+}
+.dm-el { left: 9px; }
+.dm-er { right: 9px; }
+
+/* Mouth with teeth */
+.dm-mouth {
+  position: absolute;
+  width: 40px;
+  height: 16px;
+  background: #060000;
+  border-radius: 2px 2px 10px 10px;
+  bottom: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding-top: 1px;
+  overflow: hidden;
+}
+.dm-tooth {
+  width: 9px;
+  height: 9px;
+  background: #d0d0da;
+  border-radius: 0 0 3px 3px;
+  flex-shrink: 0;
+}
+
+/* ----- Badges ----- */
+.diff-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 0;
+}
+.w-badge { background: #7bc63a; color: #0a2000; box-shadow: 0 2px 8px rgba(0,150,0,0.4); }
+.m-badge { background: #4a84d8; color: #e8f4ff; box-shadow: 0 2px 8px rgba(0,80,200,0.4); }
+.s-badge { background: #cc1010; color: #fff;    box-shadow: 0 2px 8px rgba(200,0,0,0.5); }
+
+/* ----- Card text ----- */
+.cpu-cname {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+}
+
+.cpu-stars { font-size: 0.88rem; letter-spacing: 0.04em; }
+.st     { color: rgba(255, 255, 255, 0.25); }
+.st.on  { color: #ffd700; text-shadow: 0 0 6px rgba(255, 200, 0, 0.7); }
+
+.cpu-desc {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.72rem;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+}
+
+/* ===================================================
+   GAME SCREEN
+   =================================================== */
+#app {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
 }
 
 /* ===== Scoreboard ===== */
@@ -203,14 +508,19 @@ h1 {
   padding: 0.1rem 0;
 }
 
-/* ===== Restart Button ===== */
-#restart-btn {
+/* ===== Game Buttons ===== */
+.game-btns {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.game-btn {
   background: linear-gradient(135deg, #f0a030, #e07818);
   color: #fff;
   border: none;
   border-radius: 28px;
-  padding: 0.75rem 2.2rem;
-  font-size: 1rem;
+  padding: 0.7rem 1.8rem;
+  font-size: 0.95rem;
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
@@ -220,13 +530,13 @@ h1 {
   -webkit-tap-highlight-color: transparent;
 }
 
-#restart-btn:hover {
-  filter: brightness(1.1);
+#select-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
-#restart-btn:active {
-  transform: scale(0.96);
-}
+.game-btn:hover  { filter: brightness(1.12); }
+.game-btn:active { transform: scale(0.96); }
 
 /* ===== Active player highlight ===== */
 #player-side.active .piece-icon,
@@ -249,4 +559,6 @@ h1 {
   .count { font-size: 1.4rem; }
   #turn-display { font-size: 0.75rem; }
   .player-label { display: none; }
+  .cpu-card { padding: 0.8rem 0.3rem; }
+  .cpu-avatar { width: 74px; height: 74px; }
 }

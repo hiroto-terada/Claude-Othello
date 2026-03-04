@@ -7,7 +7,80 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="app">
+
+  <!-- ===== 対戦相手選択画面 ===== -->
+  <div id="select-screen">
+    <h1>オセロ</h1>
+    <p class="select-lead">対戦相手を選ぼう</p>
+
+    <div id="cpu-cards">
+
+      <!-- 弱 -->
+      <button class="cpu-card weak-card" onclick="startGame('weak')">
+        <div class="cpu-avatar">
+          <div class="av-slime">
+            <div class="sl-shine"></div>
+            <div class="sl-eye sl-l"></div>
+            <div class="sl-eye sl-r"></div>
+            <div class="sl-mouth"></div>
+          </div>
+        </div>
+        <div class="diff-badge w-badge">弱</div>
+        <div class="cpu-cname">スライム</div>
+        <div class="cpu-stars">
+          <span class="st on">★</span><span class="st">★</span><span class="st">★</span><span class="st">★</span><span class="st">★</span>
+        </div>
+        <div class="cpu-desc">ランダムに動く<br>初心者向け</div>
+      </button>
+
+      <!-- 中 -->
+      <button class="cpu-card mid-card" onclick="startGame('medium')">
+        <div class="cpu-avatar">
+          <div class="av-knight">
+            <div class="kn-plume"></div>
+            <div class="kn-helm">
+              <div class="kn-visor"></div>
+            </div>
+          </div>
+        </div>
+        <div class="diff-badge m-badge">中</div>
+        <div class="cpu-cname">ナイト</div>
+        <div class="cpu-stars">
+          <span class="st on">★</span><span class="st on">★</span><span class="st on">★</span><span class="st">★</span><span class="st">★</span>
+        </div>
+        <div class="cpu-desc">戦略的に動く<br>手応えあり</div>
+      </button>
+
+      <!-- 強 -->
+      <button class="cpu-card strong-card" onclick="startGame('strong')">
+        <div class="cpu-avatar">
+          <div class="av-demon">
+            <div class="dm-horn dm-hl"></div>
+            <div class="dm-horn dm-hr"></div>
+            <div class="dm-face">
+              <div class="dm-eye dm-el"></div>
+              <div class="dm-eye dm-er"></div>
+              <div class="dm-mouth">
+                <div class="dm-tooth"></div>
+                <div class="dm-tooth"></div>
+                <div class="dm-tooth"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="diff-badge s-badge">強</div>
+        <div class="cpu-cname">魔王</div>
+        <div class="cpu-stars">
+          <span class="st on">★</span><span class="st on">★</span><span class="st on">★</span><span class="st on">★</span><span class="st on">★</span>
+        </div>
+        <div class="cpu-desc">先読みで動く<br>上級者向け</div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ===== ゲーム画面 ===== -->
+  <div id="app" class="hidden">
     <h1>オセロ</h1>
 
     <div id="scoreboard">
@@ -21,7 +94,7 @@
 
       <div class="player-info" id="ai-side">
         <span class="count" id="white-count">2</span>
-        <span class="player-label">CPU</span>
+        <span class="player-label" id="cpu-label">CPU</span>
         <div class="piece-icon white-icon"></div>
       </div>
     </div>
@@ -32,7 +105,10 @@
 
     <div id="message"></div>
 
-    <button id="restart-btn" onclick="initGame()">もう一度プレイ</button>
+    <div class="game-btns">
+      <button class="game-btn" id="retry-btn" onclick="initGame()">もう一度</button>
+      <button class="game-btn" id="select-btn" onclick="showSelectScreen()">相手を変える</button>
+    </div>
   </div>
 
   <script src="js/game.js"></script>
