@@ -35,8 +35,32 @@ const WEIGHTS = [
 let board      = [];
 let isGameOver = false;
 let isAiMoving = false;
-let lastMove   = null;  // { r, c } of the most recently placed piece
-let lastFlips  = [];    // [[r,c], ...] pieces flipped by last move
+let lastMove   = null;
+let lastFlips  = [];
+
+// ===== Difficulty =====
+let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong'
+
+const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王' };
+
+// ===== Screen Management =====
+
+function showSelectScreen() {
+  document.getElementById('select-screen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+}
+
+function showGameScreen() {
+  document.getElementById('select-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+}
+
+function startGame(difficulty) {
+  currentDifficulty = difficulty;
+  document.getElementById('cpu-label').textContent = CPU_NAMES[difficulty];
+  showGameScreen();
+  initGame();
+}
 
 // ===== Board Logic =====
 
@@ -54,7 +78,6 @@ function inBounds(r, c) {
   return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
 }
 
-/** Returns [[r,c], ...] of pieces flipped if `player` places at (r,c). */
 function getFlips(b, r, c, player) {
   const opp   = player === BLACK ? WHITE : BLACK;
   const flips = [];
@@ -88,10 +111,6 @@ function getValidMoves(b, player) {
   return moves;
 }
 
-/**
- * Apply a move and return { board, flips }.
- * Does NOT mutate the original board.
- */
 function applyMove(b, r, c, player) {
   const nb    = b.map(row => row.slice());
   const flips = getFlips(nb, r, c, player);
@@ -106,14 +125,6 @@ function countPieces(b, player) {
 
 // ===== AI =====
 
-/**
- * Heuristic evaluation of `b` from `player`'s perspective.
- *
- * Three components:
- *   1. Position weights  – strategic value of occupied squares.
- *   2. Mobility          – difference in number of valid moves.
- *   3. Coin parity       – raw piece count difference (weighted late-game).
- */
 function evaluate(b, player) {
   const opp = player === BLACK ? WHITE : BLACK;
 
@@ -135,42 +146,103 @@ function evaluate(b, player) {
 
   const empty = b.flat().filter(v => v === EMPTY).length;
 
-  // Early / mid game: emphasise position + mobility.
-  // End game: coin parity becomes decisive.
   return empty > 16
     ? posScore * 2 + mobility
     : posScore     + mobility + parity * 3;
 }
 
-/**
- * Select the CPU's move.
- *
- * Strategy:
- *   • 20% chance → random valid move   (keeps the game fun and beatable)
- *   • 80% chance → greedy best move evaluated by `evaluate()`
- *                  (ties broken at random)
- */
-function pickAiMove() {
+/* 弱: 85% random, 15% greedy */
+function pickAiMoveWeak() {
   const moves = getValidMoves(board, WHITE);
   if (moves.length === 0) return null;
 
-  // Random branch
+  if (Math.random() < 0.85) {
+    return moves[Math.floor(Math.random() * moves.length)];
+  }
+
+  let best = -Infinity, picks = [];
+  for (const mv of moves) {
+    const { board: nb } = applyMove(board, mv.r, mv.c, WHITE);
+    const score = evaluate(nb, WHITE);
+    if      (score > best)  { best = score; picks = [mv]; }
+    else if (score === best)  picks.push(mv);
+  }
+  return picks[Math.floor(Math.random() * picks.length)];
+}
+
+/* 中: 20% random, 80% greedy */
+function pickAiMoveMedium() {
+  const moves = getValidMoves(board, WHITE);
+  if (moves.length === 0) return null;
+
   if (Math.random() < 0.20) {
     return moves[Math.floor(Math.random() * moves.length)];
   }
 
-  // Greedy best-move
-  let best  = -Infinity;
-  let picks = [];
-
+  let best = -Infinity, picks = [];
   for (const mv of moves) {
     const { board: nb } = applyMove(board, mv.r, mv.c, WHITE);
     const score = evaluate(nb, WHITE);
-    if      (score > best) { best = score; picks = [mv]; }
-    else if (score === best)                picks.push(mv);
+    if      (score > best)  { best = score; picks = [mv]; }
+    else if (score === best)  picks.push(mv);
+  }
+  return picks[Math.floor(Math.random() * picks.length)];
+}
+
+/* 強: minimax with alpha-beta pruning (depth 4) */
+function minimaxAB(b, depth, alpha, beta, isMaximizing) {
+  const myMoves  = getValidMoves(b, WHITE);
+  const oppMoves = getValidMoves(b, BLACK);
+
+  if (depth === 0 || (myMoves.length === 0 && oppMoves.length === 0)) {
+    return evaluate(b, WHITE);
   }
 
+  if (isMaximizing) {
+    if (myMoves.length === 0) return minimaxAB(b, depth - 1, alpha, beta, false);
+    let maxVal = -Infinity;
+    for (const mv of myMoves) {
+      const { board: nb } = applyMove(b, mv.r, mv.c, WHITE);
+      const val = minimaxAB(nb, depth - 1, alpha, beta, false);
+      if (val > maxVal) maxVal = val;
+      if (val > alpha)  alpha  = val;
+      if (alpha >= beta) break;
+    }
+    return maxVal;
+  } else {
+    if (oppMoves.length === 0) return minimaxAB(b, depth - 1, alpha, beta, true);
+    let minVal = Infinity;
+    for (const mv of oppMoves) {
+      const { board: nb } = applyMove(b, mv.r, mv.c, BLACK);
+      const val = minimaxAB(nb, depth - 1, alpha, beta, true);
+      if (val < minVal) minVal = val;
+      if (val < beta)   beta   = val;
+      if (alpha >= beta) break;
+    }
+    return minVal;
+  }
+}
+
+function pickAiMoveStrong() {
+  const moves = getValidMoves(board, WHITE);
+  if (moves.length === 0) return null;
+
+  let best = -Infinity, picks = [];
+  for (const mv of moves) {
+    const { board: nb } = applyMove(board, mv.r, mv.c, WHITE);
+    const score = minimaxAB(nb, 4, -Infinity, Infinity, false);
+    if      (score > best)  { best = score; picks = [mv]; }
+    else if (score === best)  picks.push(mv);
+  }
   return picks[Math.floor(Math.random() * picks.length)];
+}
+
+function pickAiMove() {
+  switch (currentDifficulty) {
+    case 'weak':   return pickAiMoveWeak();
+    case 'strong': return pickAiMoveStrong();
+    default:       return pickAiMoveMedium();
+  }
 }
 
 // ===== Rendering =====
@@ -189,14 +261,14 @@ function render() {
 
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
-      const cell       = document.createElement('div');
-      cell.className   = 'cell';
-      cell.dataset.r   = r;  // needed by click handler
-      cell.dataset.c   = c;
+      const cell     = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r;
+      cell.dataset.c = c;
 
       if (board[r][c] !== EMPTY) {
-        const piece       = document.createElement('div');
-        piece.className   = `piece ${board[r][c] === BLACK ? 'black' : 'white'}`;
+        const piece     = document.createElement('div');
+        piece.className = `piece ${board[r][c] === BLACK ? 'black' : 'white'}`;
 
         if (lastMove && r === lastMove.r && c === lastMove.c) {
           piece.classList.add('just-placed');
@@ -234,14 +306,13 @@ function setTurn(text) {
 }
 
 function setMsg(text, isOver = false) {
-  const el    = document.getElementById('message');
+  const el       = document.getElementById('message');
   el.textContent = text;
   el.className   = isOver ? 'game-over' : '';
 }
 
 // ===== Turn Flow =====
 
-/** Called right after the player places a piece. */
 function afterPlayerMove() {
   const whiteMoves = getValidMoves(board, WHITE);
   const blackMoves = getValidMoves(board, BLACK);
@@ -252,7 +323,6 @@ function afterPlayerMove() {
   }
 
   if (whiteMoves.length === 0) {
-    // CPU cannot move → CPU passes
     setMsg('CPUはパスします');
     setTurn('あなたの番');
     isAiMoving = false;
@@ -261,14 +331,16 @@ function afterPlayerMove() {
     return;
   }
 
-  // Schedule CPU move
   isAiMoving = true;
   setTurn('CPUが考え中…');
   render();
-  setTimeout(doAiTurn, 550 + Math.random() * 500);
+
+  const delay = currentDifficulty === 'strong'
+    ? 800 + Math.random() * 600
+    : 550 + Math.random() * 500;
+  setTimeout(doAiTurn, delay);
 }
 
-/** Execute one CPU turn (possibly recursive if player must pass). */
 function doAiTurn() {
   const mv = pickAiMove();
 
@@ -291,7 +363,6 @@ function doAiTurn() {
   }
 
   if (blackMoves.length === 0) {
-    // Player cannot move → player passes, CPU plays again
     setMsg('あなたはパスします');
     setTurn('CPUが考え中…');
     render();
@@ -358,4 +429,6 @@ function initGame() {
   render();
 }
 
-document.addEventListener('DOMContentLoaded', initGame);
+document.addEventListener('DOMContentLoaded', () => {
+  // 選択画面からスタート（#app は .hidden で非表示）
+});
