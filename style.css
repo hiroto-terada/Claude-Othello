@@ -19,25 +19,45 @@ body {
 
 /* ===== ラスボス背景 (神モード) ===== */
 body.difficulty-god {
-  background-color: #07000e;
+  background-color: #030003;
   background-image:
-    /* 上部：深淵から差す紫の光 */
-    radial-gradient(ellipse 110% 55% at 50% -8%,  rgba(130, 0, 255, 0.22) 0%, transparent 65%),
-    /* 下部：奈落の炎 */
-    radial-gradient(ellipse  90% 45% at 50% 108%, rgba(160, 0,  80, 0.20) 0%, transparent 60%),
-    /* 左：古代の金光 */
-    radial-gradient(ellipse  45% 80% at -8% 45%,  rgba(220, 120, 0, 0.08) 0%, transparent 55%),
-    /* 右：魔力の霧 */
-    radial-gradient(ellipse  45% 80% at 108% 55%, rgba(180, 0,  255, 0.10) 0%, transparent 55%),
-    /* 中心：虚空 */
-    radial-gradient(ellipse  65% 55% at 50%  50%, rgba(10, 0,   25, 0.50) 0%, transparent 80%);
-  animation: godBodyPulse 5s ease-in-out infinite alternate;
+    /* 下から燃え上がる地獄の炎 */
+    radial-gradient(ellipse 130% 65% at 50% 120%,  rgba(255,  70,  0, 0.55) 0%, rgba(180, 20, 0, 0.35) 28%, transparent 58%),
+    /* 炎の照り返し */
+    radial-gradient(ellipse  70% 25% at 50% 100%,  rgba(255, 130,  0, 0.28) 0%, transparent 45%),
+    /* 上部：終末の嵐空 */
+    radial-gradient(ellipse 130% 55% at 50%  -12%, rgba( 90,  0, 140, 0.38) 0%, rgba(50, 0, 90, 0.22) 40%, transparent 65%),
+    /* 左：血の霧 */
+    radial-gradient(ellipse  55% 100% at -12% 55%, rgba(180,  0,  20, 0.22) 0%, transparent 55%),
+    /* 右：魔力の烈風 */
+    radial-gradient(ellipse  55% 100% at 112% 45%, rgba(130,  0, 200, 0.20) 0%, transparent 55%),
+    /* 中央やや下：暗黒の核 */
+    radial-gradient(ellipse  60%  55% at 50%  60%, rgba(  5,  0,   8, 0.72) 0%, transparent 80%),
+    /* 四隅を闇で塗りつぶす周縁ビネット */
+    radial-gradient(ellipse 115% 115% at 50%  50%, transparent 48%, rgba(0, 0, 0, 0.92) 100%);
+  animation: godBodyPulse 2.8s ease-in-out infinite alternate;
+}
+
+/* ゲームエリア全体に不吉な赤炎の外光 */
+body.difficulty-god #app {
+  filter: drop-shadow(0 0 18px rgba(220, 40, 0, 0.30))
+          drop-shadow(0 0 40px rgba(150, 0,  0, 0.18));
+}
+
+/* 盤面ラッパーにも炎の光輪 */
+body.difficulty-god #board-wrapper {
+  box-shadow:
+    0  0 20px rgba(220,  60,  0, 0.30),
+    0  0 50px rgba(160,  10,  0, 0.18),
+    0  0  8px rgba(255, 110,  0, 0.20);
+  border-radius: 6px;
 }
 
 @keyframes godBodyPulse {
-  0%   { background-color: #07000e; }
-  50%  { background-color: #0d0018; }
-  100% { background-color: #090010; }
+  0%  { background-color: #030003; filter: brightness(1.00); }
+  40% { background-color: #0a0003; filter: brightness(1.06); }
+  70% { background-color: #060006; filter: brightness(0.96); }
+  100%{ background-color: #040002; filter: brightness(1.03); }
 }
 
 /* ===== Utility ===== */
