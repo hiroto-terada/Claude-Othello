@@ -803,16 +803,40 @@ h1 {
 
 /* ===== Responsive tweaks ===== */
 
-/* 4カード横並びが入りきらない幅では2×2グリッドに切り替え */
+/* 4カード横並びをモバイルで収める */
 @media (max-width: 560px) {
   #cpu-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 0 8px;
+    gap: 6px;
+    padding: 0 4px;
   }
   .cpu-card {
     max-width: none;
+    padding: 0.5rem 0.1rem 0.45rem;
+    gap: 0.18rem;
+    border-radius: 12px;
+  }
+  /* アバターをスケールダウンしてレイアウト空間も縮小 */
+  .cpu-avatar {
+    transform: scale(0.65);
+    margin-top: -16px;
+    margin-bottom: -16px;
+  }
+  .diff-badge {
+    width: 26px;
+    height: 26px;
+    font-size: 0.6rem;
+  }
+  .cpu-cname {
+    font-size: 0.6rem;
+    letter-spacing: 0;
+  }
+  .cpu-stars {
+    font-size: 0.62rem;
+    letter-spacing: 0;
+  }
+  .cpu-desc {
+    font-size: 0.5rem;
+    line-height: 1.35;
   }
 }
 
@@ -821,6 +845,4 @@ h1 {
   .count { font-size: 1.4rem; }
   #turn-display { font-size: 0.75rem; }
   .player-label { display: none; }
-  .cpu-card { padding: 0.8rem 0.3rem; }
-  .cpu-avatar { width: 74px; height: 74px; }
 }
