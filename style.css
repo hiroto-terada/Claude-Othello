@@ -14,6 +14,30 @@ body {
   justify-content: center;
   padding: 1rem;
   overflow-x: hidden;
+  transition: background-color 0.8s ease;
+}
+
+/* ===== ラスボス背景 (神モード) ===== */
+body.difficulty-god {
+  background-color: #07000e;
+  background-image:
+    /* 上部：深淵から差す紫の光 */
+    radial-gradient(ellipse 110% 55% at 50% -8%,  rgba(130, 0, 255, 0.22) 0%, transparent 65%),
+    /* 下部：奈落の炎 */
+    radial-gradient(ellipse  90% 45% at 50% 108%, rgba(160, 0,  80, 0.20) 0%, transparent 60%),
+    /* 左：古代の金光 */
+    radial-gradient(ellipse  45% 80% at -8% 45%,  rgba(220, 120, 0, 0.08) 0%, transparent 55%),
+    /* 右：魔力の霧 */
+    radial-gradient(ellipse  45% 80% at 108% 55%, rgba(180, 0,  255, 0.10) 0%, transparent 55%),
+    /* 中心：虚空 */
+    radial-gradient(ellipse  65% 55% at 50%  50%, rgba(10, 0,   25, 0.50) 0%, transparent 80%);
+  animation: godBodyPulse 5s ease-in-out infinite alternate;
+}
+
+@keyframes godBodyPulse {
+  0%   { background-color: #07000e; }
+  50%  { background-color: #0d0018; }
+  100% { background-color: #090010; }
 }
 
 /* ===== Utility ===== */
