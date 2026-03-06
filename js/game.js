@@ -356,7 +356,7 @@ function render() {
         const flipIdx = lastFlips.findIndex(([fr, fc]) => fr === r && fc === c);
         if (flipIdx !== -1) {
           piece.classList.add('just-flipped');
-          piece.style.animationDelay = `${flipIdx * 40}ms`;
+          piece.style.animationDelay = `${300 + flipIdx * 80}ms`;
         }
 
         cell.appendChild(piece);
