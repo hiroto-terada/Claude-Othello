@@ -32,11 +32,12 @@ const WEIGHTS = [
 ];
 
 // ===== Game State =====
-let board      = [];
-let isGameOver = false;
-let isAiMoving = false;
-let lastMove   = null;
-let lastFlips  = [];
+let board          = [];
+let isGameOver     = false;
+let isAiMoving     = false;
+let isAwaitingFlip = false;
+let lastMove       = null;
+let lastFlips      = [];
 
 // ===== Difficulty =====
 let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong'
@@ -351,12 +352,13 @@ function render() {
 
         if (lastMove && r === lastMove.r && c === lastMove.c) {
           piece.classList.add('just-placed');
+          if (isAwaitingFlip) piece.classList.add('awaiting-flip');
         }
 
         const flipIdx = lastFlips.findIndex(([fr, fc]) => fr === r && fc === c);
         if (flipIdx !== -1) {
           piece.classList.add('just-flipped');
-          piece.style.animationDelay = `${300 + flipIdx * 80}ms`;
+          piece.style.animationDelay = `${flipIdx * 80}ms`;
         }
 
         cell.appendChild(piece);
@@ -427,11 +429,36 @@ function doAiTurn() {
 
   if (mv) {
     const result = applyMove(board, mv.r, mv.c, WHITE);
-    board     = result.board;
-    lastMove  = { r: mv.r, c: mv.c };
-    lastFlips = result.flips;
+
+    // Phase 1: show placed piece, highlight it
+    const tempBoard = board.map(row => row.slice());
+    tempBoard[mv.r][mv.c] = WHITE;
+    board          = tempBoard;
+    lastMove       = { r: mv.r, c: mv.c };
+    lastFlips      = [];
+    isAwaitingFlip = true;
+    render();
+
+    // Phase 2: flip after 1 second
+    setTimeout(() => {
+      board          = result.board;
+      lastFlips      = result.flips;
+      isAwaitingFlip = false;
+      render();
+
+      const flipAnimMs = result.flips.length > 0
+        ? (result.flips.length - 1) * 80 + 450
+        : 0;
+      setTimeout(continueAfterAiTurn, flipAnimMs);
+    }, 1000);
+
+    return;
   }
 
+  continueAfterAiTurn();
+}
+
+function continueAfterAiTurn() {
   isAiMoving = false;
 
   const blackMoves = getValidMoves(board, BLACK);
@@ -501,11 +528,12 @@ function endGame() {
 // ===== Init =====
 
 function initGame() {
-  board      = createBoard();
-  isGameOver = false;
-  isAiMoving = false;
-  lastMove   = null;
-  lastFlips  = [];
+  board          = createBoard();
+  isGameOver     = false;
+  isAiMoving     = false;
+  isAwaitingFlip = false;
+  lastMove       = null;
+  lastFlips      = [];
 
   const faceEl = document.getElementById('cpu-face');
   if (faceEl) {
