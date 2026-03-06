@@ -40,9 +40,9 @@ let lastMove       = null;
 let lastFlips      = [];
 
 // ===== Difficulty =====
-let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong'
+let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong' | 'god'
 
-const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王' };
+const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王', god: '神' };
 
 // ===== CPU Face Data =====
 
@@ -74,18 +74,31 @@ const CPU_FACE_HTML = {
         </div>
       </div>
     </div>`,
+  god: `
+    <div class="av-god">
+      <div class="gd-halo"></div>
+      <div class="gd-face">
+        <div class="gd-eye gd-el"></div>
+        <div class="gd-eye gd-er"></div>
+        <div class="gd-smile"></div>
+      </div>
+      <div class="gd-wing gd-wl"></div>
+      <div class="gd-wing gd-wr"></div>
+    </div>`,
 };
 
 const CPU_MOOD_TEXTS = {
-  weak:   { 'mood-happy': 'やったー！', 'mood-neutral': 'えへへ…',    'mood-sad': 'うわーん！' },
-  medium: { 'mood-happy': '余裕だな',   'mood-neutral': '油断するな', 'mood-sad': 'くっ…'     },
-  strong: { 'mood-happy': 'フフフ…',   'mood-neutral': 'なかなかやる', 'mood-sad': 'な、なんと…' },
+  weak:   { 'mood-happy': 'やったー！', 'mood-neutral': 'えへへ…',      'mood-sad': 'うわーん！'   },
+  medium: { 'mood-happy': '余裕だな',   'mood-neutral': '油断するな',   'mood-sad': 'くっ…'       },
+  strong: { 'mood-happy': 'フフフ…',   'mood-neutral': 'なかなかやる', 'mood-sad': 'な、なんと…'  },
+  god:    { 'mood-happy': '全て見えている', 'mood-neutral': '運命は決まっている', 'mood-sad': '…ほう' },
 };
 
 const CPU_GAMEOVER_TEXTS = {
-  weak:   { win: 'やったー！勝ったよ！', lose: 'うわーん負けたー！', draw: 'ひきわけだね！' },
-  medium: { win: '完璧だ。',             lose: '…まさか。',           draw: '互角だったな。' },
-  strong: { win: 'フハハ！圧勝だ！',     lose: '貴様…やるな。',       draw: 'くっ、引き分けか…' },
+  weak:   { win: 'やったー！勝ったよ！', lose: 'うわーん負けたー！',   draw: 'ひきわけだね！'     },
+  medium: { win: '完璧だ。',             lose: '…まさか。',             draw: '互角だったな。'     },
+  strong: { win: 'フハハ！圧勝だ！',     lose: '貴様…やるな。',         draw: 'くっ、引き分けか…'  },
+  god:    { win: '必然の結末だ。',        lose: '…奇跡を起こしたな。',   draw: '均衡した宇宙だ。'   },
 };
 
 function initCpuFace() {
@@ -317,10 +330,148 @@ function pickAiMoveStrong() {
   return picks[Math.floor(Math.random() * picks.length)];
 }
 
+/* 神: depth-6 minimax + move ordering + exact endgame solver (≤12 empties) */
+
+const GOD_ENDGAME_THRESHOLD = 12;
+
+function countEmpty(b) {
+  let n = 0;
+  for (let r = 0; r < SIZE; r++)
+    for (let c = 0; c < SIZE; c++)
+      if (b[r][c] === EMPTY) n++;
+  return n;
+}
+
+function evaluateGod(b) {
+  let posScore = 0, myCount = 0, oppCount = 0;
+  let myFrontier = 0, oppFrontier = 0;
+
+  for (let r = 0; r < SIZE; r++) {
+    for (let c = 0; c < SIZE; c++) {
+      const cell = b[r][c];
+      if (cell === EMPTY) continue;
+      if (cell === WHITE) { posScore += WEIGHTS[r][c]; myCount++; }
+      else                { posScore -= WEIGHTS[r][c]; oppCount++; }
+
+      let frontier = false;
+      for (const [dr, dc] of DIRS) {
+        const nr = r + dr, nc = c + dc;
+        if (inBounds(nr, nc) && b[nr][nc] === EMPTY) { frontier = true; break; }
+      }
+      if (frontier) { if (cell === WHITE) myFrontier++; else oppFrontier++; }
+    }
+  }
+
+  // Corner stability bonus
+  let cornerBonus = 0;
+  for (const [cr, cc] of [[0,0],[0,7],[7,0],[7,7]]) {
+    if      (b[cr][cc] === WHITE) cornerBonus += 30;
+    else if (b[cr][cc] === BLACK) cornerBonus -= 30;
+  }
+
+  const myMoves  = getValidMoves(b, WHITE).length;
+  const oppMoves = getValidMoves(b, BLACK).length;
+  const mobility  = 15 * (myMoves - oppMoves);
+  const frontier  =  5 * (oppFrontier - myFrontier);
+  const parity    = myCount - oppCount;
+  const empty     = 64 - myCount - oppCount;
+
+  return empty > 16
+    ? posScore * 3 + mobility * 2 + frontier * 2 + cornerBonus * 3
+    : posScore * 2 + mobility     + frontier     + parity * 4 + cornerBonus * 2;
+}
+
+// Sort moves best-first for alpha-beta efficiency (higher weight = try first)
+function sortMovesByWeight(moves) {
+  return [...moves].sort((a, b) => WEIGHTS[b.r][b.c] - WEIGHTS[a.r][a.c]);
+}
+
+function minimaxGod(b, depth, alpha, beta, isMaximizing) {
+  const myMoves  = getValidMoves(b, WHITE);
+  const oppMoves = getValidMoves(b, BLACK);
+
+  if (depth === 0 || (myMoves.length === 0 && oppMoves.length === 0)) {
+    return evaluateGod(b);
+  }
+
+  if (isMaximizing) {
+    if (myMoves.length === 0) return minimaxGod(b, depth - 1, alpha, beta, false);
+    let maxVal = -Infinity;
+    for (const mv of sortMovesByWeight(myMoves)) {
+      const { board: nb } = applyMove(b, mv.r, mv.c, WHITE);
+      const val = minimaxGod(nb, depth - 1, alpha, beta, false);
+      if (val > maxVal) maxVal = val;
+      if (maxVal > alpha) alpha = maxVal;
+      if (alpha >= beta) break;
+    }
+    return maxVal;
+  } else {
+    if (oppMoves.length === 0) return minimaxGod(b, depth - 1, alpha, beta, true);
+    let minVal = Infinity;
+    for (const mv of sortMovesByWeight(oppMoves)) {
+      const { board: nb } = applyMove(b, mv.r, mv.c, BLACK);
+      const val = minimaxGod(nb, depth - 1, alpha, beta, true);
+      if (val < minVal) minVal = val;
+      if (minVal < beta) beta = minVal;
+      if (alpha >= beta) break;
+    }
+    return minVal;
+  }
+}
+
+// Negamax exact endgame solver: returns (my pieces - opponent pieces) from `color`'s view
+function solveExact(b, color, alpha, beta) {
+  const opp   = color === WHITE ? BLACK : WHITE;
+  const moves = getValidMoves(b, color);
+
+  if (moves.length === 0) {
+    const oppMoves = getValidMoves(b, opp);
+    if (oppMoves.length === 0) {
+      return countPieces(b, color) - countPieces(b, opp);
+    }
+    return -solveExact(b, opp, -beta, -alpha);
+  }
+
+  let best = -Infinity;
+  for (const mv of sortMovesByWeight(moves)) {
+    const { board: nb } = applyMove(b, mv.r, mv.c, color);
+    const score = -solveExact(nb, opp, -beta, -alpha);
+    if (score > best) best = score;
+    if (best > alpha) alpha = best;
+    if (alpha >= beta) break;
+  }
+  return best;
+}
+
+function pickAiMoveGod() {
+  const moves = getValidMoves(board, WHITE);
+  if (moves.length === 0) return null;
+
+  const empty  = countEmpty(board);
+  const sorted = sortMovesByWeight(moves);
+  let best = null, bestScore = -Infinity, alpha = -Infinity;
+
+  for (const mv of sorted) {
+    const { board: nb } = applyMove(board, mv.r, mv.c, WHITE);
+    let score;
+    if (empty <= GOD_ENDGAME_THRESHOLD) {
+      // Perfect endgame: solve exactly (WHITE maximizes piece count)
+      score = -solveExact(nb, BLACK, -Infinity, -alpha);
+    } else {
+      // Deep minimax depth 6
+      score = minimaxGod(nb, 5, alpha, Infinity, false);
+    }
+    if (score > bestScore) { bestScore = score; best = mv; }
+    if (bestScore > alpha) alpha = bestScore;
+  }
+  return best;
+}
+
 function pickAiMove() {
   switch (currentDifficulty) {
     case 'weak':   return pickAiMoveWeak();
     case 'strong': return pickAiMoveStrong();
+    case 'god':    return pickAiMoveGod();
     default:       return pickAiMoveMedium();
   }
 }
@@ -418,8 +569,8 @@ function afterPlayerMove() {
   setTurn('CPUが考え中…');
   render();
 
-  const delay = currentDifficulty === 'strong'
-    ? 1400 + Math.random() * 800
+  const delay = (currentDifficulty === 'strong' || currentDifficulty === 'god')
+    ? 1200 + Math.random() * 600
     : 550 + Math.random() * 500;
   setTimeout(doAiTurn, delay);
 }

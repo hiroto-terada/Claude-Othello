@@ -89,6 +89,16 @@ h1 {
   box-shadow: 0 6px 22px rgba(180, 0, 0, 0.5);
   border: 1px solid rgba(255, 60, 60, 0.2);
 }
+.god-card {
+  background: linear-gradient(160deg, #1a1200 0%, #3d2e00 45%, #5c4600 100%);
+  box-shadow: 0 6px 28px rgba(255, 200, 0, 0.45);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  animation: godCardGlow 2.5s ease-in-out infinite alternate;
+}
+@keyframes godCardGlow {
+  from { box-shadow: 0 6px 22px rgba(255, 200, 0, 0.3); }
+  to   { box-shadow: 0 6px 36px rgba(255, 215, 0, 0.65), 0 0 18px rgba(255, 240, 100, 0.2); }
+}
 
 /* ----- Avatar container ----- */
 .cpu-avatar {
@@ -293,6 +303,93 @@ h1 {
   flex-shrink: 0;
 }
 
+/* ===================================================
+   CSS ART – GOD (神)
+   =================================================== */
+.av-god {
+  position: relative;
+  width: 82px;
+  height: 92px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Halo ring */
+.gd-halo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 14px;
+  border: 4px solid #FFD700;
+  border-radius: 50%;
+  animation: haloGlow 1.8s ease-in-out infinite alternate;
+}
+@keyframes haloGlow {
+  from { box-shadow: 0 0 4px 2px rgba(255,215,0,0.5); }
+  to   { box-shadow: 0 0 14px 5px rgba(255,215,0,1), 0 0 28px 8px rgba(255,240,100,0.35); }
+}
+
+/* Face */
+.gd-face {
+  width: 66px;
+  height: 66px;
+  background: radial-gradient(ellipse at 45% 38%, #fffde7, #ffd54f);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(255, 200, 0, 0.4),
+              inset 0 -4px 10px rgba(200, 140, 0, 0.2);
+  border: 2px solid #FFC107;
+}
+
+/* Eyes */
+.gd-eye {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #5d4037;
+  border-radius: 50%;
+  top: 22px;
+  box-shadow: 0 0 4px rgba(255, 230, 100, 0.6);
+}
+.gd-el { left: 12px; }
+.gd-er { right: 12px; }
+
+/* Serene smile */
+.gd-smile {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 10px;
+  border: 3px solid #5d4037;
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+}
+
+/* Wings */
+.gd-wing {
+  position: absolute;
+  top: 20px;
+  width: 18px;
+  height: 32px;
+}
+.gd-wl {
+  left: -6px;
+  background: linear-gradient(to right, rgba(255,255,200,0.25), rgba(255,215,0,0.45));
+  border: 1px solid rgba(255,215,0,0.6);
+  border-radius: 80% 0 80% 80%;
+}
+.gd-wr {
+  right: -6px;
+  background: linear-gradient(to left, rgba(255,255,200,0.25), rgba(255,215,0,0.45));
+  border: 1px solid rgba(255,215,0,0.6);
+  border-radius: 0 80% 80% 80%;
+}
+
 /* ----- Badges ----- */
 .diff-badge {
   width: 38px;
@@ -308,6 +405,13 @@ h1 {
 .w-badge { background: #7bc63a; color: #0a2000; box-shadow: 0 2px 8px rgba(0,150,0,0.4); }
 .m-badge { background: #4a84d8; color: #e8f4ff; box-shadow: 0 2px 8px rgba(0,80,200,0.4); }
 .s-badge { background: #cc1010; color: #fff;    box-shadow: 0 2px 8px rgba(200,0,0,0.5); }
+.g-badge { background: linear-gradient(135deg, #b8860b, #ffd700); color: #1a0e00; box-shadow: 0 2px 10px rgba(255,215,0,0.6); }
+
+/* God star style */
+.god-card .st.god-st {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.9), 0 0 12px rgba(255, 200, 0, 0.5);
+}
 
 /* ----- Card text ----- */
 .cpu-cname {
@@ -601,7 +705,8 @@ h1 {
 /* Scale avatars to fit portrait */
 #cpu-face .av-slime,
 #cpu-face .av-knight,
-#cpu-face .av-demon {
+#cpu-face .av-demon,
+#cpu-face .av-god {
   transform: scale(0.85);
   transform-origin: top center;
   transition: transform 0.2s ease-out;
@@ -676,7 +781,8 @@ h1 {
 }
 #cpu-face.mood-happy .av-slime,
 #cpu-face.mood-happy .av-knight,
-#cpu-face.mood-happy .av-demon {
+#cpu-face.mood-happy .av-demon,
+#cpu-face.mood-happy .av-god {
   animation: facePop 0.4s ease-out;
 }
 
