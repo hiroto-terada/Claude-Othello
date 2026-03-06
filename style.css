@@ -481,6 +481,12 @@ h1 {
   animation: popIn 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* Awaiting flip: pop in then pulse gold glow */
+.piece.awaiting-flip {
+  animation: popIn 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+             awaitPulse 0.4s 0.22s ease-in-out infinite alternate;
+}
+
 /* Flipped piece animation */
 .piece.just-flipped {
   animation: flipPop 0.35s ease-in-out both;
@@ -489,6 +495,11 @@ h1 {
 @keyframes popIn {
   from { transform: scale(0.2); opacity: 0.6; }
   to   { transform: scale(1);   opacity: 1;   }
+}
+
+@keyframes awaitPulse {
+  from { box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.7); }
+  to   { box-shadow: 0 0 0 5px rgba(255, 215, 0, 1), 0 0 10px rgba(255, 200, 0, 0.55); }
 }
 
 @keyframes flipPop {
