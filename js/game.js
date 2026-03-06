@@ -42,7 +42,7 @@ let lastFlips      = [];
 // ===== Difficulty =====
 let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong' | 'god'
 
-const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王', god: '神' };
+const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王', god: '神(God)' };
 
 // ===== CPU Face Data =====
 

@@ -802,6 +802,20 @@ h1 {
 }
 
 /* ===== Responsive tweaks ===== */
+
+/* 4カード横並びが入りきらない幅では2×2グリッドに切り替え */
+@media (max-width: 560px) {
+  #cpu-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 8px;
+  }
+  .cpu-card {
+    max-width: none;
+  }
+}
+
 @media (max-width: 360px) {
   h1 { font-size: 1.6rem; }
   .count { font-size: 1.4rem; }
