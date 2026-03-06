@@ -70,7 +70,6 @@ const CPU_FACE_HTML = {
         <div class="dm-mouth">
           <div class="dm-tooth"></div>
           <div class="dm-tooth"></div>
-          <div class="dm-tooth"></div>
         </div>
       </div>
     </div>`,
@@ -418,7 +417,7 @@ function afterPlayerMove() {
   render();
 
   const delay = currentDifficulty === 'strong'
-    ? 800 + Math.random() * 600
+    ? 1400 + Math.random() * 800
     : 550 + Math.random() * 500;
   setTimeout(doAiTurn, delay);
 }
