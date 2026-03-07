@@ -140,7 +140,7 @@ function updateCpuMood(gameOver = false, result = null) {
 function showSelectScreen() {
   document.getElementById('select-screen').classList.remove('hidden');
   document.getElementById('app').classList.add('hidden');
-  document.body.classList.remove('difficulty-god');
+  document.body.classList.remove('difficulty-strong', 'difficulty-god');
 }
 
 function showGameScreen() {
@@ -151,7 +151,10 @@ function showGameScreen() {
 function startGame(difficulty) {
   currentDifficulty = difficulty;
   document.getElementById('cpu-label').textContent = CPU_NAMES[difficulty];
-  document.body.classList.toggle('difficulty-god', difficulty === 'god');
+  document.body.classList.remove('difficulty-strong', 'difficulty-god');
+  if (difficulty === 'strong' || difficulty === 'god') {
+    document.body.classList.add(`difficulty-${difficulty}`);
+  }
   showGameScreen();
   initCpuFace();
   initGame();
