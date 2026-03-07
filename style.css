@@ -60,7 +60,81 @@ body.difficulty-strong #board-wrapper {
   100%{ background-color: #040002; filter: brightness(1.03); }
 }
 
-/* ===== 宇宙背景 (神モード) ===== */
+/* ===== ドラクエ風バトル背景 (ナイトモード) ===== */
+body.difficulty-medium {
+  background-color: #3e7e22;
+  background-image:
+    /* ─ 雲① 左 ─ */
+    radial-gradient(ellipse 13%  7% at 22% 13%, rgba(255,255,255,0.92) 0%, transparent 100%),
+    radial-gradient(ellipse  8%  5% at 30% 10%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(ellipse  7%  4% at 16% 17%, rgba(255,255,255,0.76) 0%, transparent 100%),
+    /* ─ 雲② 右 ─ */
+    radial-gradient(ellipse 12%  6% at 73% 20%, rgba(255,255,255,0.88) 0%, transparent 100%),
+    radial-gradient(ellipse  8%  4% at 81% 16%, rgba(255,255,255,0.82) 0%, transparent 100%),
+    radial-gradient(ellipse  5%  3% at 66% 23%, rgba(255,255,255,0.68) 0%, transparent 100%),
+    /* ─ 雲③ 中央 ─ */
+    radial-gradient(ellipse 16%  7% at 46%  7%, rgba(255,255,255,0.88) 0%, transparent 100%),
+    radial-gradient(ellipse 10%  5% at 55%  5%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    /* ─ 雲④ 遠 (小・薄) ─ */
+    radial-gradient(ellipse  7%  3% at 38% 26%, rgba(255,255,255,0.58) 0%, transparent 100%),
+    radial-gradient(ellipse  5%  2% at 59% 28%, rgba(255,255,255,0.52) 0%, transparent 100%),
+    /* ─ 空 ─ */
+    linear-gradient(180deg,
+      #4ab5ee  0%,
+      #72caf3 18%,
+      #a0dcf8 36%,
+      #bde8fc 43%,
+      transparent 50%
+    ),
+    /* ─ 遠景の山・丘 ─ */
+    radial-gradient(ellipse 38% 11% at 16% 46%, #2a6418 0%, #2a6418 50%, transparent 75%),
+    radial-gradient(ellipse 44% 14% at 54% 45%, #2f7020 0%, #2f7020 50%, transparent 75%),
+    radial-gradient(ellipse 32%  9% at 85% 47%, #2a6418 0%, #2a6418 50%, transparent 75%),
+    /* ─ 地平線の輝き ─ */
+    radial-gradient(ellipse 90%  5% at 50% 47%, rgba(210,245,190,0.38) 0%, transparent 100%),
+    /* ─ 道の中央ハイライト線 ─ */
+    conic-gradient(
+      at 50% 48.5%,
+      transparent            0deg,
+      transparent          262deg,
+      rgba(230,200,148,0.55) 262deg,
+      rgba(230,200,148,0.55) 278deg,
+      transparent          278deg,
+      transparent          360deg
+    ),
+    /* ─ 一本道（遠近感のある台形） ─ */
+    conic-gradient(
+      at 50% 48.5%,
+      transparent   0deg,
+      transparent 245deg,
+      #c9a47c     245deg,
+      #c9a47c     295deg,
+      transparent 295deg,
+      transparent 360deg
+    ),
+    /* ─ 草地（手前） ─ */
+    linear-gradient(180deg,
+      transparent  47%,
+      #54b038      50%,
+      #4a9c30      57%,
+      #3e7e22     100%
+    );
+}
+
+/* ゲームエリアに木漏れ日風のシャドウ */
+body.difficulty-medium #app {
+  filter: drop-shadow(0 3px 14px rgba(0,40,0,0.40));
+}
+
+/* 盤面を浮かせる */
+body.difficulty-medium #board-wrapper {
+  box-shadow:
+    0  4px 20px rgba(0, 30, 0, 0.40),
+    0  0   6px rgba(0, 80, 0, 0.20);
+  border-radius: 6px;
+}
+
+
 body.difficulty-god {
   background-color: #000008;
   background-image:
