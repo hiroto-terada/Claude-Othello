@@ -17,8 +17,8 @@ body {
   transition: background-color 0.8s ease;
 }
 
-/* ===== ラスボス背景 (神モード) ===== */
-body.difficulty-god {
+/* ===== ラスボス背景 (魔王モード) ===== */
+body.difficulty-strong {
   background-color: #030003;
   background-image:
     /* 下から燃え上がる地獄の炎 */
@@ -35,17 +35,17 @@ body.difficulty-god {
     radial-gradient(ellipse  60%  55% at 50%  60%, rgba(  5,  0,   8, 0.72) 0%, transparent 80%),
     /* 四隅を闇で塗りつぶす周縁ビネット */
     radial-gradient(ellipse 115% 115% at 50%  50%, transparent 48%, rgba(0, 0, 0, 0.92) 100%);
-  animation: godBodyPulse 2.8s ease-in-out infinite alternate;
+  animation: demonBodyPulse 2.8s ease-in-out infinite alternate;
 }
 
 /* ゲームエリア全体に不吉な赤炎の外光 */
-body.difficulty-god #app {
+body.difficulty-strong #app {
   filter: drop-shadow(0 0 18px rgba(220, 40, 0, 0.30))
           drop-shadow(0 0 40px rgba(150, 0,  0, 0.18));
 }
 
 /* 盤面ラッパーにも炎の光輪 */
-body.difficulty-god #board-wrapper {
+body.difficulty-strong #board-wrapper {
   box-shadow:
     0  0 20px rgba(220,  60,  0, 0.30),
     0  0 50px rgba(160,  10,  0, 0.18),
@@ -53,11 +53,111 @@ body.difficulty-god #board-wrapper {
   border-radius: 6px;
 }
 
-@keyframes godBodyPulse {
+@keyframes demonBodyPulse {
   0%  { background-color: #030003; filter: brightness(1.00); }
   40% { background-color: #0a0003; filter: brightness(1.06); }
   70% { background-color: #060006; filter: brightness(0.96); }
   100%{ background-color: #040002; filter: brightness(1.03); }
+}
+
+/* ===== 宇宙背景 (神モード) ===== */
+body.difficulty-god {
+  background-color: #000008;
+  background-image:
+    /* ── 星粒 (白・小) ── */
+    radial-gradient(1px 1px at  4%  6%, rgba(255,255,255,0.95) 0%, transparent 100%),
+    radial-gradient(1px 1px at 11%  2%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    radial-gradient(1px 1px at 18% 11%, rgba(255,255,255,0.70) 0%, transparent 100%),
+    radial-gradient(1px 1px at 27%  4%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35%  9%, rgba(255,255,255,0.60) 0%, transparent 100%),
+    radial-gradient(1px 1px at 43%  2%, rgba(255,255,255,0.90) 0%, transparent 100%),
+    radial-gradient(1px 1px at 52%  7%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 61%  3%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70%  8%, rgba(255,255,255,0.70) 0%, transparent 100%),
+    radial-gradient(1px 1px at 79%  1%, rgba(255,255,255,0.90) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88%  6%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    radial-gradient(1px 1px at 95%  4%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    radial-gradient(1px 1px at  7% 17%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22% 22%, rgba(255,255,255,0.55) 0%, transparent 100%),
+    radial-gradient(1px 1px at 38% 19%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 14%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    radial-gradient(1px 1px at 73% 20%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 91% 16%, rgba(255,255,255,0.70) 0%, transparent 100%),
+    radial-gradient(1px 1px at  3% 32%, rgba(255,255,255,0.60) 0%, transparent 100%),
+    radial-gradient(1px 1px at 16% 38%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 29%, rgba(255,255,255,0.50) 0%, transparent 100%),
+    radial-gradient(1px 1px at 47% 34%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 64% 27%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 82% 33%, rgba(255,255,255,0.60) 0%, transparent 100%),
+    radial-gradient(1px 1px at 97% 28%, rgba(255,255,255,0.70) 0%, transparent 100%),
+    radial-gradient(1px 1px at  9% 48%, rgba(255,255,255,0.55) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 52%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    radial-gradient(1px 1px at 42% 44%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    radial-gradient(1px 1px at 59% 50%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 77% 46%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 93% 53%, rgba(255,255,255,0.60) 0%, transparent 100%),
+    radial-gradient(1px 1px at  5% 65%, rgba(255,255,255,0.70) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 70%, rgba(255,255,255,0.50) 0%, transparent 100%),
+    radial-gradient(1px 1px at 36% 62%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    radial-gradient(1px 1px at 53% 68%, rgba(255,255,255,0.60) 0%, transparent 100%),
+    radial-gradient(1px 1px at 69% 63%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 71%, rgba(255,255,255,0.85) 0%, transparent 100%),
+    radial-gradient(1px 1px at 98% 66%, rgba(255,255,255,0.55) 0%, transparent 100%),
+    radial-gradient(1px 1px at 13% 80%, rgba(255,255,255,0.70) 0%, transparent 100%),
+    radial-gradient(1px 1px at 29% 85%, rgba(255,255,255,0.60) 0%, transparent 100%),
+    radial-gradient(1px 1px at 46% 78%, rgba(255,255,255,0.80) 0%, transparent 100%),
+    radial-gradient(1px 1px at 63% 83%, rgba(255,255,255,0.55) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 88%, rgba(255,255,255,0.75) 0%, transparent 100%),
+    radial-gradient(1px 1px at 94% 81%, rgba(255,255,255,0.65) 0%, transparent 100%),
+    /* ── 輝く大粒の星 ── */
+    radial-gradient(2px 2px at 15% 25%, rgba(200, 220, 255, 0.95) 0%, transparent 100%),
+    radial-gradient(2px 2px at 48%  5%, rgba(255, 240, 200, 0.90) 0%, transparent 100%),
+    radial-gradient(2px 2px at 72% 38%, rgba(200, 210, 255, 0.95) 0%, transparent 100%),
+    radial-gradient(2px 2px at 33% 72%, rgba(255, 255, 220, 0.85) 0%, transparent 100%),
+    radial-gradient(2px 2px at 87% 15%, rgba(220, 200, 255, 0.90) 0%, transparent 100%),
+    radial-gradient(2px 2px at  6% 90%, rgba(200, 240, 255, 0.85) 0%, transparent 100%),
+    radial-gradient(3px 3px at 58% 55%, rgba(255, 255, 255, 0.70) 0%, transparent 100%),
+    radial-gradient(2px 2px at 90% 48%, rgba(240, 220, 255, 0.88) 0%, transparent 100%),
+    /* ── 星雲 ── */
+    radial-gradient(ellipse 55% 35% at 25% 35%, rgba( 60,  20, 120, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 30% at 75% 55%, rgba( 20,  60, 140, 0.20) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 25% at 55% 20%, rgba(100,  20, 100, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 20% at 15% 70%, rgba( 20,  80, 160, 0.14) 0%, transparent 60%),
+    /* ── 天の川：斜め淡光帯 ── */
+    linear-gradient(
+      118deg,
+      transparent          18%,
+      rgba(180,200,255,0.04) 32%,
+      rgba(210,225,255,0.08) 42%,
+      rgba(230,240,255,0.10) 50%,
+      rgba(210,225,255,0.08) 58%,
+      rgba(180,200,255,0.04) 68%,
+      transparent          82%
+    ),
+    /* ── 周縁ビネット ── */
+    radial-gradient(ellipse 120% 120% at 50% 50%, transparent 50%, rgba(0,0,5,0.85) 100%);
+  animation: spaceBodyPulse 8s ease-in-out infinite alternate;
+}
+
+/* ゲームエリアに深宇宙の青白い輝き */
+body.difficulty-god #app {
+  filter: drop-shadow(0 0 20px rgba( 80, 120, 255, 0.20))
+          drop-shadow(0 0 50px rgba( 40,  60, 180, 0.12));
+}
+
+/* 盤面ラッパーに星の光輪 */
+body.difficulty-god #board-wrapper {
+  box-shadow:
+    0  0 18px rgba(100, 150, 255, 0.22),
+    0  0 45px rgba( 60,  80, 200, 0.12),
+    0  0  6px rgba(180, 200, 255, 0.18);
+  border-radius: 6px;
+}
+
+@keyframes spaceBodyPulse {
+  0%   { background-color: #000008; }
+  50%  { background-color: #00000e; }
+  100% { background-color: #000006; }
 }
 
 /* ===== Utility ===== */
