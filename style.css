@@ -17,6 +17,98 @@ body {
   transition: background-color 0.8s ease;
 }
 
+/* ===== 森の背景 (スライムモード) ===== */
+body.difficulty-weak {
+  background-color: #071303;
+  background-repeat: no-repeat;
+
+  /* 各レイヤーの並び順：前面→奥 (CSS は先に書いた方が前面) */
+  background-image:
+    /* ─ 前景の暗い葉（左右の縁を覆う） ─ */
+    radial-gradient(ellipse 32% 44% at   0% 50%, #0b1c04 0%, transparent 58%),
+    radial-gradient(ellipse 26% 38% at  18% 46%, #0f2406 0%, transparent 56%),
+    radial-gradient(ellipse 32% 44% at 100% 50%, #0b1c04 0%, transparent 58%),
+    radial-gradient(ellipse 26% 38% at  82% 46%, #0f2406 0%, transparent 56%),
+    /* ─ 手前の幹（左・右） ─ */
+    linear-gradient(175deg, #7a5028 0%, #3e2010 100%),
+    linear-gradient(185deg, #724820 0%, #3a1e0e 100%),
+    /* ─ 木漏れ日の光の筋 ─ */
+    linear-gradient(168deg, transparent 28%, rgba(255,252,210,0.09) 37%, rgba(255,252,210,0.09) 44%, transparent 54%),
+    linear-gradient(195deg, transparent 22%, rgba(255,248,200,0.06) 33%, rgba(255,248,200,0.06) 41%, transparent 51%),
+    /* ─ 中景の幹 ─ */
+    linear-gradient(180deg, #634020 0%, #38200e 100%),
+    linear-gradient(178deg, #5c3a1a 0%, #361e0c 100%),
+    linear-gradient(182deg, #634020 0%, #38200e 100%),
+    linear-gradient(180deg, #5c3a1a 0%, #361e0c 100%),
+    /* ─ 中景の葉 ─ */
+    radial-gradient(ellipse 36% 32% at  6% 38%, #1c4410 0%, transparent 65%),
+    radial-gradient(ellipse 30% 28% at 28% 34%, #225012 0%, transparent 65%),
+    radial-gradient(ellipse 30% 26% at 52% 32%, #1c4410 0%, transparent 65%),
+    radial-gradient(ellipse 30% 28% at 74% 35%, #225012 0%, transparent 65%),
+    radial-gradient(ellipse 36% 32% at 96% 38%, #1c4410 0%, transparent 65%),
+    /* ─ 遠景の幹 ─ */
+    linear-gradient(180deg, #4e3218 0%, #2c1a0a 100%),
+    linear-gradient(180deg, #483018 0%, #2a1808 100%),
+    linear-gradient(180deg, #4e3218 0%, #2c1a0a 100%),
+    /* ─ 遠景の葉 ─ */
+    radial-gradient(ellipse 24% 22% at 14% 26%, rgba(48, 98,22,0.82) 0%, transparent 70%),
+    radial-gradient(ellipse 20% 18% at 37% 22%, rgba(44, 90,18,0.74) 0%, transparent 70%),
+    radial-gradient(ellipse 20% 18% at 63% 22%, rgba(44, 90,18,0.74) 0%, transparent 70%),
+    radial-gradient(ellipse 24% 22% at 86% 25%, rgba(48, 98,22,0.82) 0%, transparent 70%),
+    /* ─ 空（木漏れ日・中央上） ─ */
+    radial-gradient(ellipse 30% 22% at 50% 15%, #5cb8ea 0%, #84cef2 34%, #aaddf6 60%, transparent 80%),
+    /* ─ 林床・地面 ─ */
+    linear-gradient(180deg, transparent 57%, #1c3808 68%, #112006 82%, #071303 100%);
+
+  background-size:
+    /* 前景の葉 4層 */
+    100% 100%, 100% 100%, 100% 100%, 100% 100%,
+    /* 手前の幹 L・R */
+    8% 60%,   8% 58%,
+    /* 光の筋 2層 */
+    100% 100%, 100% 100%,
+    /* 中景の幹 4本 */
+    6% 54%,   5% 48%,   6% 52%,   5% 48%,
+    /* 中景の葉 5層 */
+    100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%,
+    /* 遠景の幹 3本 */
+    4% 44%,   3% 40%,   4% 44%,
+    /* 遠景の葉 4層・空・林床 */
+    100% 100%, 100% 100%, 100% 100%, 100% 100%,
+    100% 100%, 100% 100%;
+
+  background-position:
+    /* 前景の葉 4層 */
+    left top, left top, left top, left top,
+    /* 手前の幹 L・R */
+    left 1%  bottom,   right 1%  bottom,
+    /* 光の筋 2層 */
+    left top, left top,
+    /* 中景の幹 4本 */
+    left 14%  bottom,  left 27%  bottom,
+    left 72%  bottom,  right 13% bottom,
+    /* 中景の葉 5層 */
+    left top, left top, left top, left top, left top,
+    /* 遠景の幹 3本 */
+    left 38%  bottom,  left 49%  bottom,  left 62%  bottom,
+    /* 遠景の葉 4層・空・林床 */
+    left top, left top, left top, left top,
+    left top, left top;
+}
+
+/* ゲームエリアに木漏れ日フィルター */
+body.difficulty-weak #app {
+  filter: drop-shadow(0 3px 16px rgba(0, 30, 0, 0.50));
+}
+
+/* 盤面を浮かせる */
+body.difficulty-weak #board-wrapper {
+  box-shadow:
+    0  4px 22px rgba(0,  25, 0, 0.50),
+    0  0   8px rgba(0,  80, 0, 0.22);
+  border-radius: 6px;
+}
+
 /* ===== ラスボス背景 (魔王モード) ===== */
 body.difficulty-strong {
   background-color: #030003;
