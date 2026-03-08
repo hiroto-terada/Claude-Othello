@@ -762,6 +762,7 @@ h1 {
   cursor: default;
   position: relative;
   transition: background 0.12s;
+  touch-action: manipulation;
 }
 
 /* Valid move hint */
