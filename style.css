@@ -5,8 +5,9 @@
   padding: 0;
 }
 
-html {
+html, body {
   touch-action: manipulation;
+  -ms-touch-action: manipulation;
 }
 
 body {

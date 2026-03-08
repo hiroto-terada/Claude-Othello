@@ -1,11 +1,19 @@
 'use strict';
 
-// ===== ピンチズーム禁止 (iOS Safari 対策) =====
-document.addEventListener('gesturestart', e => e.preventDefault());
-document.addEventListener('gesturechange', e => e.preventDefault());
-document.addEventListener('gestureend', e => e.preventDefault());
+// ===== ズーム禁止 (iOS Safari 対策) =====
+// ピンチズーム禁止
+document.addEventListener('gesturestart',  e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+document.addEventListener('gestureend',    e => e.preventDefault(), { passive: false });
 document.addEventListener('touchmove', e => {
   if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+// ダブルタップズーム禁止
+let _lastTap = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - _lastTap < 300) e.preventDefault();
+  _lastTap = now;
 }, { passive: false });
 
 // ===== Constants =====
