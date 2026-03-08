@@ -1,5 +1,13 @@
 'use strict';
 
+// ===== ピンチズーム禁止 (iOS Safari 対策) =====
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('gesturechange', e => e.preventDefault());
+document.addEventListener('gestureend', e => e.preventDefault());
+document.addEventListener('touchmove', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
 // ===== Constants =====
 const EMPTY = 0;
 const BLACK = 1; // Player
