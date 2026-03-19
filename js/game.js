@@ -235,7 +235,7 @@ function getAdviceExplanation(b, r, c) {
 
 // ===== Advice Minimax (BLACK視点、神AIより深い) =====
 
-const ADVICE_ENDGAME_THRESHOLD = 18; // 神の12より大きく、より早く完全読み切りを発動
+const ADVICE_ENDGAME_THRESHOLD = 12; // 神AIと同じ閾値。18は計算爆発（10M節点）でフリーズする
 
 // BLACK最大化・WHITE最小化のminimax（評価値はBLACKに有利=正）
 function minimaxAdvice(b, depth, alpha, beta, isBlackTurn) {
