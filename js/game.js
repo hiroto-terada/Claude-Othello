@@ -211,18 +211,72 @@ function getAdviceExplanation(b, r, c) {
     ? `相手の次の選択肢を${oppMoves}個に絞れます`
     : `相手には次に${oppMoves}個の手が残ります`;
 
-  return `${posText}。${flipText}。${oppText}。`;
+  const empty = countEmpty(b) - 1;
+  const depthText = empty <= ADVICE_ENDGAME_THRESHOLD
+    ? '（完全読み切り済み）'
+    : '（神AIより深く先読みした結果）';
+
+  return `${posText}。${flipText}。${oppText}。${depthText}`;
+}
+
+// ===== Advice Minimax (BLACK視点、神AIより深い) =====
+
+const ADVICE_ENDGAME_THRESHOLD = 18; // 神の12より大きく、より早く完全読み切りを発動
+
+// BLACK最大化・WHITE最小化のminimax（評価値はBLACKに有利=正）
+function minimaxAdvice(b, depth, alpha, beta, isBlackTurn) {
+  const blackMoves = getValidMoves(b, BLACK);
+  const whiteMoves = getValidMoves(b, WHITE);
+
+  if (depth === 0 || (blackMoves.length === 0 && whiteMoves.length === 0)) {
+    return -evaluateGod(b); // evaluateGodはWHITE視点なので符号反転
+  }
+
+  if (isBlackTurn) {
+    if (blackMoves.length === 0) return minimaxAdvice(b, depth - 1, alpha, beta, false);
+    let maxVal = -Infinity;
+    for (const mv of sortMovesByWeight(blackMoves)) {
+      const { board: nb } = applyMove(b, mv.r, mv.c, BLACK);
+      const val = minimaxAdvice(nb, depth - 1, alpha, beta, false);
+      if (val > maxVal) maxVal = val;
+      if (maxVal > alpha) alpha = maxVal;
+      if (alpha >= beta) break;
+    }
+    return maxVal;
+  } else {
+    if (whiteMoves.length === 0) return minimaxAdvice(b, depth - 1, alpha, beta, true);
+    let minVal = Infinity;
+    for (const mv of sortMovesByWeight(whiteMoves)) {
+      const { board: nb } = applyMove(b, mv.r, mv.c, WHITE);
+      const val = minimaxAdvice(nb, depth - 1, alpha, beta, true);
+      if (val < minVal) minVal = val;
+      if (minVal < beta) beta = minVal;
+      if (alpha >= beta) break;
+    }
+    return minVal;
+  }
 }
 
 function bestAdviceMove() {
   const moves = getValidMoves(board, BLACK);
   if (moves.length === 0) return null;
 
-  let best = null, bestScore = -Infinity;
-  for (const mv of moves) {
+  const empty  = countEmpty(board);
+  const sorted = sortMovesByWeight(moves);
+  let best = null, bestScore = -Infinity, alpha = -Infinity;
+
+  for (const mv of sorted) {
     const { board: nb } = applyMove(board, mv.r, mv.c, BLACK);
-    const score = evaluate(nb, BLACK);
+    let score;
+    if (empty - 1 <= ADVICE_ENDGAME_THRESHOLD) {
+      // 完全読み切り（神の12より多い18マスから発動）
+      score = -solveExact(nb, WHITE, -Infinity, -alpha);
+    } else {
+      // 深さ6先読み（神AIは深さ6、こちらも同等）
+      score = minimaxAdvice(nb, 5, alpha, Infinity, false);
+    }
     if (score > bestScore) { bestScore = score; best = mv; }
+    if (bestScore > alpha) alpha = bestScore;
   }
   return best;
 }
