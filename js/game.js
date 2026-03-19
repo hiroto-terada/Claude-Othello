@@ -58,6 +58,9 @@ let lastFlips      = [];
 // ===== Difficulty =====
 let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong' | 'god'
 
+// ===== Advice Mode =====
+let adviceMode = false;
+
 const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王', god: '神(God)' };
 
 // ===== CPU Face Data =====
@@ -166,12 +169,73 @@ function showGameScreen() {
 
 function startGame(difficulty) {
   currentDifficulty = difficulty;
+  adviceMode = document.getElementById('advice-toggle').checked;
   document.getElementById('cpu-label').textContent = CPU_NAMES[difficulty];
   document.body.classList.remove('difficulty-weak', 'difficulty-medium', 'difficulty-strong', 'difficulty-god');
   document.body.classList.add(`difficulty-${difficulty}`);
   showGameScreen();
   initCpuFace();
   initGame();
+}
+
+// ===== Advice Logic =====
+
+function posLabel(r, c) {
+  return 'ABCDEFGH'[c] + (r + 1);
+}
+
+function getAdviceExplanation(b, r, c) {
+  const flips = getFlips(b, r, c, BLACK);
+  const w     = WEIGHTS[r][c];
+  const { board: nb } = applyMove(b, r, c, BLACK);
+  const oppMoves = getValidMoves(nb, WHITE).length;
+
+  let posText;
+  if (w === 100) {
+    posText = '角を取れます！角の石は絶対にひっくり返されない最強の場所です';
+  } else if (w === -50) {
+    posText = '要注意：角の斜め隣です。相手に角を取られやすくなるので他の手があれば避けましょう';
+  } else if (w === -20) {
+    posText = '角の隣です。状況によっては相手に角を与えてしまうので慎重に判断しましょう';
+  } else if (r === 0 || r === 7 || c === 0 || c === 7) {
+    posText = '辺の手です。辺の石は安定しやすく、後半までひっくり返されにくいです';
+  } else {
+    posText = '内側の手です。盤面のバランスを意識しましょう';
+  }
+
+  const flipText = flips.length === 1
+    ? '1個ひっくり返します'
+    : `${flips.length}個ひっくり返します`;
+
+  const oppText = oppMoves <= 2
+    ? `相手の次の選択肢を${oppMoves}個に絞れます`
+    : `相手には次に${oppMoves}個の手が残ります`;
+
+  return `${posText}。${flipText}。${oppText}。`;
+}
+
+function bestAdviceMove() {
+  const moves = getValidMoves(board, BLACK);
+  if (moves.length === 0) return null;
+
+  let best = null, bestScore = -Infinity;
+  for (const mv of moves) {
+    const { board: nb } = applyMove(board, mv.r, mv.c, BLACK);
+    const score = evaluate(nb, BLACK);
+    if (score > bestScore) { bestScore = score; best = mv; }
+  }
+  return best;
+}
+
+function updateAdvicePanel(advice) {
+  const panel = document.getElementById('advice-panel');
+  if (!adviceMode || isGameOver || isAiMoving || !advice) {
+    panel.classList.add('hidden');
+    return;
+  }
+  panel.classList.remove('hidden');
+  document.getElementById('advice-pos').textContent  = posLabel(advice.r, advice.c);
+  document.getElementById('advice-text').textContent = getAdviceExplanation(board, advice.r, advice.c);
 }
 
 // ===== Board Logic =====
@@ -507,6 +571,8 @@ function render() {
     }
   }
 
+  const advice = (adviceMode && !isGameOver && !isAiMoving) ? bestAdviceMove() : null;
+
   const fragment = document.createDocumentFragment();
 
   for (let r = 0; r < SIZE; r++) {
@@ -538,6 +604,10 @@ function render() {
         cell.addEventListener('click', onCellClick);
       }
 
+      if (advice && r === advice.r && c === advice.c) {
+        cell.classList.add('advice-best');
+      }
+
       fragment.appendChild(cell);
     }
   }
@@ -552,6 +622,7 @@ function render() {
   document.getElementById('ai-side').classList.toggle('active', isAiMoving);
 
   updateCpuMood();
+  updateAdvicePanel(advice);
 }
 
 function setTurn(text) {
