@@ -59,7 +59,26 @@ let lastFlips      = [];
 let currentDifficulty = 'medium'; // 'weak' | 'medium' | 'strong' | 'god'
 
 // ===== Advice Mode =====
-let adviceMode = false;
+let adviceMode        = false;
+let currentAdvice     = null; // null | { loading: true } | { r, c }
+let adviceScheduleId  = null;
+
+function clearAdvice() {
+  if (adviceScheduleId) { clearTimeout(adviceScheduleId); adviceScheduleId = null; }
+  currentAdvice = null;
+}
+
+function scheduleAdvice() {
+  clearAdvice();
+  if (!adviceMode || isGameOver || isAiMoving) return;
+  currentAdvice = { loading: true };
+  adviceScheduleId = setTimeout(() => {
+    adviceScheduleId = null;
+    if (!adviceMode || isGameOver || isAiMoving) return;
+    currentAdvice = bestAdviceMove(); // null or { r, c }
+    render();
+  }, 30);
+}
 
 const CPU_NAMES = { weak: 'スライム', medium: 'ナイト', strong: '魔王', god: '神(God)' };
 
@@ -211,12 +230,7 @@ function getAdviceExplanation(b, r, c) {
     ? `相手の次の選択肢を${oppMoves}個に絞れます`
     : `相手には次に${oppMoves}個の手が残ります`;
 
-  const empty = countEmpty(b) - 1;
-  const depthText = empty <= ADVICE_ENDGAME_THRESHOLD
-    ? '（完全読み切り済み）'
-    : '（神AIより深く先読みした結果）';
-
-  return `${posText}。${flipText}。${oppText}。${depthText}`;
+  return `${posText}。${flipText}。${oppText}。`;
 }
 
 // ===== Advice Minimax (BLACK視点、神AIより深い) =====
@@ -281,15 +295,20 @@ function bestAdviceMove() {
   return best;
 }
 
-function updateAdvicePanel(advice) {
+function updateAdvicePanel() {
   const panel = document.getElementById('advice-panel');
-  if (!adviceMode || isGameOver || isAiMoving || !advice) {
+  if (!adviceMode || isGameOver || isAiMoving || !currentAdvice) {
     panel.classList.add('hidden');
     return;
   }
   panel.classList.remove('hidden');
-  document.getElementById('advice-pos').textContent  = posLabel(advice.r, advice.c);
-  document.getElementById('advice-text').textContent = getAdviceExplanation(board, advice.r, advice.c);
+  if (currentAdvice.loading) {
+    document.getElementById('advice-pos').textContent  = '';
+    document.getElementById('advice-text').textContent = '考え中…';
+    return;
+  }
+  document.getElementById('advice-pos').textContent  = posLabel(currentAdvice.r, currentAdvice.c);
+  document.getElementById('advice-text').textContent = getAdviceExplanation(board, currentAdvice.r, currentAdvice.c);
 }
 
 // ===== Board Logic =====
@@ -625,7 +644,8 @@ function render() {
     }
   }
 
-  const advice = (adviceMode && !isGameOver && !isAiMoving) ? bestAdviceMove() : null;
+  // アドバイスは非同期で計算済みの currentAdvice を使う（render内では計算しない）
+  const advice = (currentAdvice && !currentAdvice.loading) ? currentAdvice : null;
 
   const fragment = document.createDocumentFragment();
 
@@ -676,7 +696,7 @@ function render() {
   document.getElementById('ai-side').classList.toggle('active', isAiMoving);
 
   updateCpuMood();
-  updateAdvicePanel(advice);
+  updateAdvicePanel();
 }
 
 function setTurn(text) {
@@ -705,6 +725,7 @@ function afterPlayerMove() {
     setTurn('あなたの番');
     isAiMoving = false;
     render();
+    scheduleAdvice();
     setTimeout(() => setMsg(''), 1400);
     return;
   }
@@ -780,6 +801,7 @@ function continueAfterAiTurn() {
   setTurn('あなたの番');
   setMsg('');
   render();
+  scheduleAdvice();
 }
 
 function onCellClick(e) {
@@ -791,6 +813,7 @@ function onCellClick(e) {
 
   if (!isValidMove(board, r, c, BLACK)) return;
 
+  clearAdvice();
   const result = applyMove(board, r, c, BLACK);
   board     = result.board;
   lastMove  = { r, c };
@@ -801,6 +824,7 @@ function onCellClick(e) {
 }
 
 function endGame() {
+  clearAdvice();
   isGameOver = true;
   lastMove   = null;
   lastFlips  = [];
@@ -841,6 +865,7 @@ function initGame() {
   setTurn('あなたの番');
   setMsg('');
   render();
+  scheduleAdvice();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
