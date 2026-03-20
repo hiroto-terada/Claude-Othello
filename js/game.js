@@ -173,12 +173,138 @@ function updateCpuMood(gameOver = false, result = null) {
   bubbleEl.textContent = text;
 }
 
+// ===== BGM System =====
+
+let audioCtx   = null;
+let bgmMuted   = false;
+let bgmActive  = false;
+let bgmStep    = 0;
+let bgmNextT   = 0;
+let bgmTimerId = null;
+
+const BGM = {
+  // スライム: 明るい C メジャー、軽快なアドベンチャー曲
+  weak: {
+    wave: 'triangle', vol: 0.10, filter: 1800,
+    notes: [
+      [523.25,0.23],[392.00,0.23],[329.63,0.23],[392.00,0.23],
+      [440.00,0.23],[349.23,0.23],[392.00,0.46],
+      [329.63,0.23],[261.63,0.23],[329.63,0.23],[392.00,0.23],
+      [440.00,0.46],[392.00,0.46],
+      [523.25,0.23],[440.00,0.23],[392.00,0.23],[329.63,0.23],
+      [293.66,0.23],[261.63,0.69],
+    ],
+  },
+  // ナイト: G メジャー英雄的マーチ、緊張感ある行進曲
+  medium: {
+    wave: 'square', vol: 0.055, filter: 900,
+    notes: [
+      [392.00,0.27],[392.00,0.27],[493.88,0.27],[0,0.27],
+      [440.00,0.27],[440.00,0.27],[392.00,0.55],
+      [523.25,0.27],[493.88,0.27],[440.00,0.27],[0,0.27],
+      [392.00,0.55],[0,0.55],
+      [587.33,0.27],[523.25,0.27],[493.88,0.27],[440.00,0.27],
+      [392.00,1.09],
+    ],
+  },
+  // 魔王: D マイナー、ダークで激しいラストバトル曲
+  strong: {
+    wave: 'sawtooth', vol: 0.07, filter: 700,
+    notes: [
+      [293.66,0.11],[0,0.11],[293.66,0.11],[0,0.11],[349.23,0.32],
+      [415.30,0.43],[0,0.11],[293.66,0.11],[415.30,0.11],[391.99,0.43],
+      [369.99,0.11],[0,0.11],[369.99,0.11],[0,0.11],[349.23,0.32],
+      [329.63,0.43],[0,0.11],[293.66,0.43],
+      [293.66,0.11],[0,0.11],[311.13,0.11],[0,0.11],[349.23,0.32],
+      [391.99,0.21],[369.99,0.21],[349.23,0.21],[293.66,0.65],
+    ],
+  },
+  // 神: E マイナーバロック聖歌、神秘的で荘厳なサクラッド曲
+  god: {
+    wave: 'sine', vol: 0.12, filter: 2000, harmony: true,
+    notes: [
+      [329.63,0.46],[369.99,0.46],[392.00,0.46],[440.00,0.46],
+      [493.88,0.46],[523.25,0.46],[493.88,0.46],[440.00,0.46],
+      [392.00,0.46],[440.00,0.23],[392.00,0.23],[369.99,0.46],[329.63,0.46],
+      [293.66,0.23],[329.63,0.23],[369.99,0.46],[392.00,0.46],[329.63,0.92],
+    ],
+  },
+};
+
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function scheduleNote(freq, startT, dur, track) {
+  if (!freq) return;
+  const osc  = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = 'lowpass';
+  filt.frequency.value = track.filter;
+  osc.type = track.wave;
+  osc.frequency.value = freq;
+  osc.connect(filt); filt.connect(gain); gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(track.vol, startT);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startT + dur * 0.88);
+  osc.start(startT); osc.stop(startT + dur);
+
+  if (track.harmony) {
+    const osc2  = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.value = freq * (2 / 3); // 完全5度下
+    osc2.connect(gain2); gain2.connect(audioCtx.destination);
+    gain2.gain.setValueAtTime(track.vol * 0.45, startT);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, startT + dur * 0.88);
+    osc2.start(startT); osc2.stop(startT + dur);
+  }
+}
+
+function bgmTick() {
+  if (!audioCtx || !bgmActive || bgmMuted) return;
+  const track = BGM[currentDifficulty];
+  if (!track) return;
+  while (bgmNextT < audioCtx.currentTime + 0.12) {
+    const [freq, dur] = track.notes[bgmStep % track.notes.length];
+    scheduleNote(freq, bgmNextT, dur, track);
+    bgmNextT += dur;
+    bgmStep = (bgmStep + 1) % track.notes.length;
+  }
+  bgmTimerId = setTimeout(bgmTick, 50);
+}
+
+function startBgm() {
+  stopBgm();
+  initAudio();
+  bgmActive = true;
+  bgmStep   = 0;
+  bgmNextT  = audioCtx.currentTime + 0.1;
+  if (!bgmMuted) bgmTick();
+}
+
+function stopBgm() {
+  bgmActive = false;
+  if (bgmTimerId) { clearTimeout(bgmTimerId); bgmTimerId = null; }
+}
+
+function toggleMute() {
+  bgmMuted = !bgmMuted;
+  document.getElementById('mute-btn').textContent = bgmMuted ? '🔇' : '🎵';
+  if (!bgmMuted && bgmActive) {
+    bgmNextT = audioCtx.currentTime + 0.1;
+    bgmTick();
+  }
+}
+
 // ===== Screen Management =====
 
 function showSelectScreen() {
   document.getElementById('select-screen').classList.remove('hidden');
   document.getElementById('app').classList.add('hidden');
   document.body.classList.remove('difficulty-weak', 'difficulty-medium', 'difficulty-strong', 'difficulty-god');
+  stopBgm();
 }
 
 function showGameScreen() {
@@ -193,6 +319,7 @@ function startGame(difficulty) {
   document.body.classList.remove('difficulty-weak', 'difficulty-medium', 'difficulty-strong', 'difficulty-god');
   document.body.classList.add(`difficulty-${difficulty}`);
   showGameScreen();
+  startBgm();
   initCpuFace();
   initGame();
 }

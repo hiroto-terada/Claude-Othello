@@ -921,6 +921,25 @@ h1 {
 .game-btn:hover  { filter: brightness(1.12); }
 .game-btn:active { transform: scale(0.96); }
 
+.mute-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 2px solid rgba(255, 255, 255, 0.38);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.18s, transform 0.1s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.mute-btn:hover  { filter: brightness(1.2); }
+.mute-btn:active { transform: scale(0.92); }
+
 /* ===== CPU Portrait Panel ===== */
 #cpu-portrait {
   width: 100%;
