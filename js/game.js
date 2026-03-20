@@ -176,7 +176,7 @@ function updateCpuMood(gameOver = false, result = null) {
 // ===== BGM System =====
 
 let audioCtx   = null;
-let bgmMuted   = false;
+let bgmMuted   = true;
 let bgmActive  = false;
 let bgmStep    = 0;
 let bgmNextT   = 0;
