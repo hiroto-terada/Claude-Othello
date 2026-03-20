@@ -203,34 +203,89 @@ function posLabel(r, c) {
   return 'ABCDEFGH'[c] + (r + 1);
 }
 
-function getAdviceExplanation(b, r, c) {
-  const flips = getFlips(b, r, c, BLACK);
-  const w     = WEIGHTS[r][c];
-  const { board: nb } = applyMove(b, r, c, BLACK);
-  const oppMoves = getValidMoves(nb, WHITE).length;
+function posTypeName(r, c) {
+  const w = WEIGHTS[r][c];
+  if (w === 100)  return '角';
+  if (w === -50)  return 'Xマス（角の斜め隣）';
+  if (w === -20)  return 'Cマス（角の隣）';
+  if (r === 0 || r === 7 || c === 0 || c === 7) return '辺';
+  return '内側';
+}
 
-  let posText;
-  if (w === 100) {
-    posText = '角を取れます！角の石は絶対にひっくり返されない最強の場所です';
-  } else if (w === -50) {
-    posText = '要注意：角の斜め隣です。相手に角を取られやすくなるので他の手があれば避けましょう';
-  } else if (w === -20) {
-    posText = '角の隣です。状況によっては相手に角を与えてしまうので慎重に判断しましょう';
-  } else if (r === 0 || r === 7 || c === 0 || c === 7) {
-    posText = '辺の手です。辺の石は安定しやすく、後半までひっくり返されにくいです';
-  } else {
-    posText = '内側の手です。盤面のバランスを意識しましょう';
+function getAdviceExplanation(b, r, c) {
+  const flips   = getFlips(b, r, c, BLACK);
+  const w       = WEIGHTS[r][c];
+  const empty   = countEmpty(b);
+  const { board: nb } = applyMove(b, r, c, BLACK);
+  const oppMovesAfter = getValidMoves(nb, WHITE).length;
+
+  // 全候補手の中で最も多く取れる手を探す（比較用）
+  const allMoves = getValidMoves(b, BLACK);
+  let greedyMove = null;
+  let greedyFlips = flips.length;
+  for (const mv of allMoves) {
+    const f = getFlips(b, mv.r, mv.c, BLACK).length;
+    if (f > greedyFlips) { greedyFlips = f; greedyMove = mv; }
   }
 
-  const flipText = flips.length === 1
-    ? '1個ひっくり返します'
-    : `${flips.length}個ひっくり返します`;
+  const parts = [];
 
-  const oppText = oppMoves <= 2
-    ? `相手の次の選択肢を${oppMoves}個に絞れます`
-    : `相手には次に${oppMoves}個の手が残ります`;
+  // ① 位置の質
+  if (w === 100) {
+    parts.push('角を取れます！角の石は絶対にひっくり返されない最強の位置です');
+  } else if (w === -50) {
+    parts.push('Xマス（角の斜め隣）です。危険ですが先読みの結果、現局面での最善手です');
+  } else if (w === -20) {
+    parts.push('Cマス（角の隣）です。リスクはありますが先読みでは最善手です');
+  } else if (r === 0 || r === 7 || c === 0 || c === 7) {
+    parts.push('辺の手です。辺の石は安定してひっくり返されにくく、後半も残りやすいです');
+  } else {
+    parts.push('内側の手です');
+  }
 
-  return `${posText}。${flipText}。${oppText}。`;
+  // ② 石数比較と戦略的根拠
+  if (greedyMove !== null) {
+    // より多く取れる手があるのにこちらを推奨している理由を説明
+    const { board: gnb } = applyMove(b, greedyMove.r, greedyMove.c, BLACK);
+    const greedyOppMoves = getValidMoves(gnb, WHITE).length;
+    const greedyType     = posTypeName(greedyMove.r, greedyMove.c);
+
+    if (oppMovesAfter < greedyOppMoves) {
+      parts.push(
+        `${flips.length}個しか取れませんが、${greedyFlips}個取れる手より優先しています。` +
+        `多く取ると相手の選択肢が${greedyOppMoves}個残りますが、この手なら${oppMovesAfter}個に絞れます。` +
+        `序盤・中盤は石数より「相手の動ける場所を減らす」ことが重要です`
+      );
+    } else if (WEIGHTS[greedyMove.r][greedyMove.c] < w) {
+      parts.push(
+        `${flips.length}個しか取れませんが、${greedyFlips}個取れる手（${greedyType}）は` +
+        `位置が不利なため避けています。石数より配置の質を優先した判断です`
+      );
+    } else {
+      parts.push(
+        `${flips.length}個しか取れませんが、${greedyFlips}個取れる手より8手先を読んだ結果` +
+        `こちらが最終的に有利になります`
+      );
+    }
+  } else {
+    parts.push(`${flips.length}個ひっくり返します`);
+  }
+
+  // ③ 相手の選択肢（①②で既に触れていない場合）
+  if (greedyMove === null && oppMovesAfter <= 3) {
+    parts.push(`この手の後、相手の選択肢を${oppMovesAfter}個に絞れます`);
+  }
+
+  // ④ ゲームフェーズ別の一言
+  if (empty <= 16) {
+    parts.push('終盤：石の数が直接勝敗を決めます。一手一手が重要です');
+  } else if (empty <= 32) {
+    parts.push('中盤：相手を制限しながら安定した配置を築く時期です');
+  } else {
+    parts.push('序盤：角・辺を意識して相手の選択肢を狭めましょう');
+  }
+
+  return parts.join('。') + '。';
 }
 
 // ===== Advice Minimax (BLACK視点、神AIより深い) =====
