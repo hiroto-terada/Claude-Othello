@@ -235,7 +235,7 @@ function getAdviceExplanation(b, r, c) {
 
 // ===== Advice Minimax (BLACK視点、神AIより深い) =====
 
-const ADVICE_ENDGAME_THRESHOLD = 16; // 残り17マス以下で完全読み切り発動（神の12より早い）
+const ADVICE_ENDGAME_THRESHOLD = 14; // 残り15マス以下で完全読み切り（速度と精度のバランス）
 
 // BLACK最大化・WHITE最小化のminimax（評価値はBLACKに有利=正）
 function minimaxAdvice(b, depth, alpha, beta, isBlackTurn) {
@@ -286,8 +286,8 @@ function bestAdviceMove() {
       // 完全読み切り（神の12より多い18マスから発動）
       score = -solveExact(nb, WHITE, -Infinity, -alpha);
     } else {
-      // 深さ7先読み（神AIは深さ6、アドバイスはそれより1手深い）
-      score = minimaxAdvice(nb, 6, alpha, Infinity, false);
+      // 深さ8先読み（神AIは深さ6、アドバイスはそれより2手深い）
+      score = minimaxAdvice(nb, 7, alpha, Infinity, false);
     }
     if (score > bestScore) { bestScore = score; best = mv; }
     if (bestScore > alpha) alpha = bestScore;
